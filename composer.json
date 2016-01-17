@@ -1,7 +1,7 @@
 {
   "name": "nimayneb/advini",
   "description": "Advanced INI reader",
-  "keywords": [ "advanced", "initialize", "reader", "multi", "array", "value", "expand", "configuration", "settings"],
+  "keywords": [ "advanced", "initialize", "reader", "multi", "array", "extract", "expand", "configuration", "settings"],
   "homepage": "https://github.com/nimayneb/advini",
   "license": "BSD-3-Clause",
   "version": "1.0.0",
@@ -13,7 +13,8 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "4.8.*"
+    "phpunit/phpunit": "4.8.*",
+    "php": ">5.4.10"
   },
   "autoload": {
     "psr-4": {
