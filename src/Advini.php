@@ -77,14 +77,9 @@ class Advini {
 	 * Advini constructor.
 	 *
 	 * @param AbstractWrapper $methodsObject
-	 * @param string          $toEncoding
 	 */
-	public function __construct(AbstractWrapper $methodsObject = null, $toEncoding = null) {
+	public function __construct(AbstractWrapper $methodsObject = null) {
 		$this->wrapper = $methodsObject;
-
-		if (null !== $this->toEncoding) {
-			$this->toEncoding = $this->setEncoding($toEncoding);
-		}
 	}
 
 	/**
@@ -247,19 +242,24 @@ class Advini {
 	protected function importFromFile($file) {
 		$importFile = sprintf('%s/%s', $this->cwd, $file);
 
-		return $this->getFromFile($importFile, true);
+		return $this->getFromFile($importFile, $this->toEncoding, true);
 	}
 
 	/**
 	 * @param string $file
-	 * @param bool $finalize
+	 * @param string $charset
+	 * @param bool   $finalize
 	 *
-	 * @throws Exception
 	 * @return array
+	 * @throws Exception
 	 */
-	public function getFromFile($file, $finalize = false) {
+	public function getFromFile($file, $charset = null, $finalize = false) {
 		$this->assertFile($file);
 		$this->cwd = dirname($file);
+
+		if (null !== $this->toEncoding) {
+			$this->toEncoding = $this->setEncoding($charset);
+		}
 
 		$configuration = parse_ini_file($file, true);
 		if (false === $configuration) {
