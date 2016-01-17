@@ -55,7 +55,7 @@ key = value
 ```
 
 Resulted output:
-```
+```text
 array(
     "category" => array(
         "subcategory" => array(
@@ -96,7 +96,8 @@ key = value
 ```
 
 Resulted output:
-```array(
+```text
+array(
     "category" => array(
         "subcategory" => array(
             "key" => "value"
@@ -137,7 +138,7 @@ key = @const key
 ```
 
 Resulted output:
-```
+```text
 array(
     "category" => array(
         "subcategory" => array(
@@ -152,7 +153,7 @@ Calling methods before setting
 
 Uses:
 ```ini
-{key}:{method} = {value}
+{key}:{method}(...) = {value}
 ```
 
 
@@ -180,7 +181,7 @@ key3:md5 = "secret"
 ```
 
 Resulted output:
-```
+```text
 array(
     "category" => array(
         "subcategory" => array(
@@ -209,7 +210,7 @@ key3:md5 = "secret"
 ```
 
 Resulted output:
-```
+```text
 array(
     "category" => array(
         "subcategory" => "a:3:{s:4:"key1";i:0;s:4:"key2";s:3:"123";s:4:"key3";s:32:"5ebe2294ecd0e0f08eab7690d2a6ee69";}"
