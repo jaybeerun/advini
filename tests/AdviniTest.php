@@ -101,4 +101,13 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportForConstantsWithMethod.ini');
 		$this->assertEquals($this->resultWithMethod, serialize($configuration));
 	}
+
+	/**
+	 *
+	 */
+	public function testSimpleImportAsKeyFileWithConstantsAndMethods() {
+		$iniFile = new Advini();
+		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportAsKey.ini');
+		$this->assertEquals($this->result, serialize($configuration));
+	}
 }

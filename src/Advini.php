@@ -34,13 +34,15 @@ use JBR\Advini\Wrapper\AbstractWrapper;
  */
 class Advini {
 
-	const TOKEN_IMPORT = '/^@import (.+)$/';
+	const TOKEN_CHARSET = '@charset';
 
-	const TOKEN_CONSTANT = '/^@const (.+)$/';
+	const TOKEN_IMPORT = '@import';
 
-	const TOKEN_METHOD_SEPERATOR = ':';
+	const TOKEN_CONSTANT = '@const';
 
-	const TOKEN_MULTI_KEY_SEPERATOR = '/';
+	const TOKEN_METHOD_SEPARATOR = ':';
+
+	const TOKEN_MULTI_KEY_SEPARATOR = '/';
 
 	const TOKEN_DEFAULT_VALUE = ':';
 
@@ -62,12 +64,27 @@ class Advini {
 	protected $cwd;
 
 	/**
+	 * @var string
+	 */
+	protected $toEncoding = null;
+
+	/**
+	 * @var string
+	 */
+	protected $fromEncoding = null;
+
+	/**
 	 * Advini constructor.
 	 *
 	 * @param AbstractWrapper $methodsObject
+	 * @param string          $toEncoding
 	 */
-	public function __construct(AbstractWrapper $methodsObject = null) {
+	public function __construct(AbstractWrapper $methodsObject = null, $toEncoding = null) {
 		$this->wrapper = $methodsObject;
+
+		if (null !== $this->toEncoding) {
+			$this->toEncoding = $this->setEncoding($toEncoding);
+		}
 	}
 
 	/**
@@ -83,8 +100,8 @@ class Advini {
 				$this->extractKeys($value);
 			}
 
-			if (false !== strpos($key, self::TOKEN_MULTI_KEY_SEPERATOR)) {
-				$key_arr = explode(self::TOKEN_MULTI_KEY_SEPERATOR, $key);
+			if (false !== strpos($key, self::TOKEN_MULTI_KEY_SEPARATOR)) {
+				$key_arr = explode(self::TOKEN_MULTI_KEY_SEPARATOR, $key);
 				$last_key = array_pop($key_arr);
 				$cur_elem = &$source;
 
@@ -126,8 +143,6 @@ class Advini {
 			$this->throughConfiguration($configuration, $finalize);
 		} elseif (true === is_string($configuration)) {
 			$this->processValue($configuration);
-		} else {
-			var_dump($configuration);
 		}
 	}
 
@@ -139,8 +154,10 @@ class Advini {
 	 * @return void
 	 */
 	protected function throughConfiguration(array &$configuration, $finalize = false) {
+		$this->checkImportStatement($configuration);
+
 		foreach ($configuration as $originKey => $value) {
-			$methods = explode(self::TOKEN_METHOD_SEPERATOR, $originKey);
+			$methods = explode(self::TOKEN_METHOD_SEPARATOR, $originKey);
 
 			if ((true === $finalize) && (1 < count($methods))) {
 				$toSetKey = array_shift($methods);
@@ -150,6 +167,7 @@ class Advini {
 				}
 
 				$configuration[$toSetKey] = $value;
+
 				unset($configuration[$originKey]);
 			} else {
 				$this->compileConfiguration($value, true);
@@ -189,22 +207,47 @@ class Advini {
 	 * @return void
 	 */
 	protected function processValue(&$value) {
-		if (0 < preg_match(self::TOKEN_IMPORT, $value, $matches)) {
-			$importFile = sprintf('%s/%s', $this->cwd, $matches[1]);
-			$value = $this->getFromFile($importFile, true);
-		} elseif (0 < preg_match(self::TOKEN_CONSTANT, $value, $matches)) {
-			list ($key, $defaultValue) = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
+		if ('@' === $value{0}) {
+			if (0 < preg_match(sprintf('/^%s (.+)$/', self::TOKEN_IMPORT), $value, $matches)) {
+				$value = $this->importFromFile($matches[1]);
+			} elseif (0 < preg_match(sprintf('/^%s (.+)$/', self::TOKEN_CONSTANT), $value, $matches)) {
+				list ($key, $defaultValue) = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
 
-			if (true === isset($this->constants[$key])) {
-				$value = $this->constants[$key];
-			} else {
-				$value = $defaultValue;
+				if (true === isset($this->constants[$key])) {
+					$value = $this->convert($this->constants[$key]);
+				} else {
+					$value = $this->convert($defaultValue);
 
-				if (null === $value) {
-					$value = '';
+					if (null === $value) {
+						$value = '';
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	protected function convert($value) {
+		if (null !== $this->fromEncoding) {
+			$value = mb_convert_encoding($value, $this->toEncoding, $this->fromEncoding);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param string $file
+	 *
+	 * @return array
+	 */
+	protected function importFromFile($file) {
+		$importFile = sprintf('%s/%s', $this->cwd, $file);
+
+		return $this->getFromFile($importFile, true);
 	}
 
 	/**
@@ -219,10 +262,59 @@ class Advini {
 		$this->cwd = dirname($file);
 
 		$configuration = parse_ini_file($file, true);
+		if (false === $configuration) {
+			throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
+		}
+
+		$this->prepareConfiguration($configuration);
 		$this->extractKeys($configuration);
 		$this->compileConfiguration($configuration, $finalize);
 
 		return $configuration;
+	}
+
+	/**
+	 * @param array $configuration
+	 *
+	 * @return void
+	 */
+	protected function checkImportStatement(array &$configuration) {
+		if (true === isset($configuration[self::TOKEN_IMPORT])) {
+			$additionalConfiguration = $this->importFromFile($configuration[self::TOKEN_IMPORT]);
+			$configuration = array_merge($configuration, $additionalConfiguration);
+
+			unset($configuration[self::TOKEN_IMPORT]);
+		}
+	}
+
+	/**
+	 * @param array $configuration
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
+	protected function checkCharsetStatement(array &$configuration) {
+		if (true === isset($configuration[self::TOKEN_CHARSET])) {
+			$this->fromEncoding = $this->setEncoding($configuration[self::TOKEN_CHARSET]);
+
+			if (null === $this->toEncoding) {
+				throw new Exception(
+					sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
+				);
+			}
+
+			unset($configuration[self::TOKEN_CHARSET]);
+		}
+	}
+
+	/**
+	 * @param array $configuration
+	 *
+	 * @return void
+	 */
+	protected function prepareConfiguration(array &$configuration) {
+		$this->checkImportStatement($configuration);
+		$this->checkCharsetStatement($configuration);
 	}
 
 	/**
@@ -234,5 +326,20 @@ class Advini {
 		$constants = parse_ini_file($file, true);
 		$this->extractKeys($constants);
 		$this->constants = $constants;
+	}
+
+	/**
+	 * @param string $charset
+	 *
+	 * @return string
+	 */
+	private function setEncoding($charset) {
+		$charsets = array_flip(mb_list_encodings());
+
+		if (false === isset($charsets[$charset])) {
+			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
+		}
+
+		return $charset;
 	}
 }
