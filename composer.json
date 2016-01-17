@@ -1,0 +1,22 @@
+{
+  "name": "nimayneb/advini",
+  "description": "Advanced INI reader",
+  "keywords": [ "advanced", "initialize", "reader", "value", "expand", "configuration", "settings"],
+  "homepage": "https://github.com/nimayneb/advini",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Jan Runte",
+      "email": "github-1411@jan-runte.de",
+      "role": "Developer"
+    }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "4.8.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "JBR\\Advini\\": "src/"
+    }
+  }
+}
