@@ -4,6 +4,7 @@
   "keywords": [ "advanced", "initialize", "reader", "multi", "array", "value", "expand", "configuration", "settings"],
   "homepage": "https://github.com/nimayneb/advini",
   "license": "BSD-3-Clause",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "Jan Runte",
