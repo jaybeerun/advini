@@ -133,7 +133,7 @@ class Advini {
 	 * @throws Exception
 	 * @return void
 	 */
-	protected function compileConfiguration(&$configuration, $finalize = false) {
+	protected function processConfiguration(&$configuration, $finalize = false) {
 		if (true === is_array($configuration)) {
 			$this->throughConfiguration($configuration, $finalize);
 		} elseif (true === is_string($configuration)) {
@@ -165,7 +165,7 @@ class Advini {
 
 				unset($configuration[$originKey]);
 			} else {
-				$this->compileConfiguration($value, true);
+				$this->processConfiguration($value, true);
 				$configuration[$originKey] = $value;
 			}
 		}
@@ -183,7 +183,7 @@ class Advini {
 	protected function processMethod($methodName, $key, $value, $finalize = false) {
 		$result = null;
 
-		$this->compileConfiguration($value, $finalize);
+		$this->processConfiguration($value, $finalize);
 
 		try {
 			$result = $this->wrapper->execute($methodName, $value);
@@ -203,19 +203,47 @@ class Advini {
 	 */
 	protected function processValue(&$value) {
 		if ('@' === $value{0}) {
-			if (0 < preg_match(sprintf('/^%s (.+)$/', self::TOKEN_IMPORT), $value, $matches)) {
-				$value = $this->importFromFile($matches[1]);
-			} elseif (0 < preg_match(sprintf('/^%s (.+)$/', self::TOKEN_CONSTANT), $value, $matches)) {
-				list ($key, $defaultValue) = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
+			if (false === $this->checkImportStatementForValue($value)) {
+				$this->checkConstantStatement($value);
+			}
+		}
+	}
 
-				if (true === isset($this->constants[$key])) {
-					$value = $this->convert($this->constants[$key]);
-				} else {
-					$value = $this->convert($defaultValue);
+	/**
+	 * @param string $value
+	 *
+	 * @return boolean
+	 */
+	protected function checkImportStatementForValue(&$value) {
+		$pattern = sprintf('/^%s (.+)$/', self::TOKEN_IMPORT);
+		$result = false;
 
-					if (null === $value) {
-						$value = '';
-					}
+		if (0 < preg_match($pattern, $value, $matches)) {
+			$value = $this->importFromFile($matches[1]);
+			$result = true;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	protected function checkConstantStatement(&$value) {
+		$pattern = sprintf('/^%s (.+)$/', self::TOKEN_CONSTANT);
+
+		if (0 < preg_match($pattern, $value, $matches)) {
+			list ($key, $defaultValue) = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
+
+			if (true === isset($this->constants[$key])) {
+				$value = $this->convert($this->constants[$key]);
+			} else {
+				$value = $this->convert($defaultValue);
+
+				if (null === $value) {
+					$value = '';
 				}
 			}
 		}
@@ -251,7 +279,6 @@ class Advini {
 	 * @param bool   $finalize
 	 *
 	 * @return array
-	 * @throws Exception
 	 */
 	public function getFromFile($file, $charset = null, $finalize = false) {
 		$this->assertFile($file);
@@ -261,14 +288,28 @@ class Advini {
 			$this->toEncoding = $this->setEncoding($charset);
 		}
 
+		$configuration = $this->parseIniFile($file);
+
+		$this->checkImportStatement($configuration);
+		$this->checkCharsetStatement($configuration);
+		$this->extractKeys($configuration);
+		$this->processConfiguration($configuration, $finalize);
+
+		return $configuration;
+	}
+
+	/**
+	 * @param string $file
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function parseIniFile($file) {
 		$configuration = parse_ini_file($file, true);
+
 		if (false === $configuration) {
 			throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
 		}
-
-		$this->prepareConfiguration($configuration);
-		$this->extractKeys($configuration);
-		$this->compileConfiguration($configuration, $finalize);
 
 		return $configuration;
 	}
@@ -305,16 +346,6 @@ class Advini {
 
 			unset($configuration[self::TOKEN_CHARSET]);
 		}
-	}
-
-	/**
-	 * @param array $configuration
-	 *
-	 * @return void
-	 */
-	protected function prepareConfiguration(array &$configuration) {
-		$this->checkImportStatement($configuration);
-		$this->checkCharsetStatement($configuration);
 	}
 
 	/**
