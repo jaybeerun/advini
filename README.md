@@ -24,15 +24,27 @@ property3 = value3
 It supports:
 
 - defining complex keys and sections
+	```ini
+	category/property = value
+	```
 - importing any INI file
+	```ini
+	property = @import default.ini
+	```
 - including constants (from INI file)
+	```ini
+	property = @const 
+	```
 - calling methods before setting
+	```ini
+	property:sha1 = geheim1234 
+	```
 
 
 Defining complex keys and sections
 ----------------------------------
 
-Uses:
+Usage:
 ```ini
 [{key1}/{key2}(...)]
 key3/key4(...) = value
@@ -69,7 +81,7 @@ array(
 Importing any INI file
 ----------------------
 
-Uses:
+Usage:
 ```ini
 {key} = @import {file}
 ```
@@ -110,7 +122,7 @@ array(
 Including constants
 -------------------
 
-Uses:
+Usage:
 ```ini
 {key} = @const {constant}
 ```
@@ -151,7 +163,7 @@ array(
 Calling methods before setting
 ------------------------------
 
-Uses:
+Usage:
 ```ini
 {key}:{method}(...) = {value}
 ```
@@ -195,7 +207,7 @@ array(
 
 Or calling by sections:
 
-Uses:
+Usage:
 ```ini
 [{section}:{method}]
 {key} = {value}

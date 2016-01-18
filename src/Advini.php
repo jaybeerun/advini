@@ -364,7 +364,7 @@ class Advini {
 	 *
 	 * @return string
 	 */
-	private function setEncoding($charset) {
+	protected function setEncoding($charset) {
 		$charsets = array_flip(mb_list_encodings());
 
 		if (false === isset($charsets[$charset])) {
