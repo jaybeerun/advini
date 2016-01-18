@@ -83,6 +83,42 @@ class Advini {
 	}
 
 	/**
+	 * @param string $file
+	 * @param string $charset
+	 * @param bool   $finalize
+	 *
+	 * @return array
+	 */
+	public function getFromFile($file, $charset = null, $finalize = false) {
+		$this->assertFile($file);
+		$this->cwd = dirname($file);
+
+		if (null !== $this->toEncoding) {
+			$this->toEncoding = $this->setEncoding($charset);
+		}
+
+		$configuration = $this->parseIniFile($file);
+
+		$this->checkImportStatement($configuration);
+		$this->checkCharsetStatement($configuration);
+		$this->extractKeys($configuration);
+		$this->processConfiguration($configuration, $finalize);
+
+		return $configuration;
+	}
+
+	/**
+	 * @param string $file
+	 *
+	 * @return void
+	 */
+	public function setConstantsFromFile($file) {
+		$constants = parse_ini_file($file, true);
+		$this->extractKeys($constants);
+		$this->constants = $constants;
+	}
+
+	/**
 	 * Extract multi named keys like "key1/key2".
 	 *
 	 * @param array $source
@@ -275,31 +311,6 @@ class Advini {
 
 	/**
 	 * @param string $file
-	 * @param string $charset
-	 * @param bool   $finalize
-	 *
-	 * @return array
-	 */
-	public function getFromFile($file, $charset = null, $finalize = false) {
-		$this->assertFile($file);
-		$this->cwd = dirname($file);
-
-		if (null !== $this->toEncoding) {
-			$this->toEncoding = $this->setEncoding($charset);
-		}
-
-		$configuration = $this->parseIniFile($file);
-
-		$this->checkImportStatement($configuration);
-		$this->checkCharsetStatement($configuration);
-		$this->extractKeys($configuration);
-		$this->processConfiguration($configuration, $finalize);
-
-		return $configuration;
-	}
-
-	/**
-	 * @param string $file
 	 *
 	 * @return array
 	 * @throws Exception
@@ -346,17 +357,6 @@ class Advini {
 
 			unset($configuration[self::TOKEN_CHARSET]);
 		}
-	}
-
-	/**
-	 * @param string $file
-	 *
-	 * @return void
-	 */
-	public function setConstantsFromFile($file) {
-		$constants = parse_ini_file($file, true);
-		$this->extractKeys($constants);
-		$this->constants = $constants;
 	}
 
 	/**
