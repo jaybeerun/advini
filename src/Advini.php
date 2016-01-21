@@ -119,6 +119,15 @@ class Advini {
 	}
 
 	/**
+ 	 * @param array $constants
+ 	 * 
+ 	 * @return void
+ 	 */
+	public function setConstants(array $constants) {
+		$this->constants = $constants;
+	}
+
+	/**
 	 * Extract multi named keys like "key1/key2".
 	 *
 	 * @param array $source
@@ -184,7 +193,7 @@ class Advini {
 	 * @throws Exception
 	 * @return void
 	 */
-	protected function throughConfiguration(array &$configuration, $finalize = false) {
+	public function throughConfiguration(array &$configuration, $finalize = false) {
 		$this->checkImportStatement($configuration);
 
 		foreach ($configuration as $originKey => $value) {
