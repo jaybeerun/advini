@@ -178,7 +178,7 @@ class Advini {
 	 * @throws Exception
 	 * @return void
 	 */
-	protected function processConfiguration(&$configuration, $finalize = false) {
+	public function processConfiguration(&$configuration, $finalize = false) {
 		if (true === is_array($configuration)) {
 			$this->throughConfiguration($configuration, $finalize);
 		} elseif (true === is_string($configuration)) {
@@ -193,7 +193,7 @@ class Advini {
 	 * @throws Exception
 	 * @return void
 	 */
-	public function throughConfiguration(array &$configuration, $finalize = false) {
+	protected function throughConfiguration(array &$configuration, $finalize = false) {
 		$this->checkImportStatement($configuration);
 
 		foreach ($configuration as $originKey => $value) {
