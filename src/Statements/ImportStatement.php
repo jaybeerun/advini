@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini\Statements;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,17 +26,82 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Interfaces\StatementInterface;
+
 /**
  *
  *
  */
-interface WrapperInterface {
+class ImportStatement implements StatementInterface {
+
+	const TOKEN = '@import';
+
+	const KEY = 'import';
 
 	/**
-	 * @param string $methodName
-	 * @param mixed  $value
+	 * @param mixed $key
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
-	public function execute($methodName, $value);
+	public function canProcessKey($key) {
+		return (true === is_array($key));
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @return bool
+	 */
+	public function canProcessValue($value) {
+		return (true === is_string($value));
+	}
+
+	/**
+	 * @param AdviniAdapter $adapter
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function processValue(AdviniAdapter $adapter, &$value) {
+		$pattern = sprintf('/^%s (.+)$/', self::TOKEN);
+
+		if (0 < preg_match($pattern, $value, $matches)) {
+			$value = $this->importFromFile($adapter, $matches[1]);
+		}
+	}
+
+	/**
+	 * @param AdviniAdapter $adapter
+	 * @param string $file
+	 *
+	 * @return array
+	 */
+	protected function importFromFile(AdviniAdapter $adapter, $file) {
+		$importFile = sprintf('%s/%s', $adapter->getCwd(), $file);
+
+		return $adapter->getFromFile($importFile);
+	}
+
+	/**
+	 * @param AdviniAdapter $adapter
+	 * @param array  $configuration
+	 *
+	 * @return boolean
+	 */
+	public function processKey(AdviniAdapter $adapter, array &$configuration) {
+		if (true === isset($configuration[self::TOKEN])) {
+			$additionalConfiguration = $this->importFromFile($adapter, $configuration[self::TOKEN]);
+			$configuration = array_merge($configuration, $additionalConfiguration);
+
+			unset($configuration[self::TOKEN]);
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getKey() {
+		return self::KEY;
+	}
 }

@@ -26,17 +26,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use JBR\Advini\AdviniAdapter;
+
 /**
  *
  *
  */
-interface WrapperInterface {
+interface StatementInterface {
 
 	/**
-	 * @param string $methodName
-	 * @param mixed  $value
-	 *
-	 * @return mixed
+	 * @return string
 	 */
-	public function execute($methodName, $value);
+	public function getKey();
+
+	/**
+	 * @param mixed $key
+	 *
+	 * @return bool
+	 */
+	public function canProcessKey($key);
+
+	/**
+	 * @param AdviniAdapter $adapter
+	 * @param array $configuration
+	 *
+	 * @return void
+	 */
+	public function processKey(AdviniAdapter $adapter, array &$configuration);
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @return bool
+	 */
+	public function canProcessValue($value);
+
+	/**
+	 * @param AdviniAdapter $adapter
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function processValue(AdviniAdapter $adapter, &$value);
 }

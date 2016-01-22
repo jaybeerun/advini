@@ -4,7 +4,7 @@
  * Copyright (c) 2016, Jan Runte
  * All rights reserved.
  *
- * Redistribution  and use in source and binary forms, with or without modification,
+ * Redistribution and use in source and  binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions  of source code must retain the above copyright notice,  this
@@ -27,6 +27,10 @@
  ************************************************************************************/
 
 use Exception;
+use JBR\Advini\Interfaces\StatementInterface;
+use JBR\Advini\Traits\ArrayUtility;
+use JBR\Advini\Traits\Encoding;
+use JBR\Advini\Traits\FileUtility;
 use JBR\Advini\Wrapper\AbstractWrapper;
 
 /**
@@ -34,17 +38,11 @@ use JBR\Advini\Wrapper\AbstractWrapper;
  */
 class Advini {
 
-	const TOKEN_CHARSET = '@charset';
-
-	const TOKEN_IMPORT = '@import';
-
-	const TOKEN_CONSTANT = '@const';
+	use Encoding, ArrayUtility, FileUtility;
 
 	const TOKEN_METHOD_SEPARATOR = ':';
 
 	const TOKEN_MULTI_KEY_SEPARATOR = '/';
-
-	const TOKEN_DEFAULT_VALUE = ':';
 
 	/**
 	 * @var AbstractWrapper
@@ -54,24 +52,17 @@ class Advini {
 	/**
 	 * @var array
 	 */
-	protected $constants;
-
-	/**
-	 * Current working directory
-	 *
-	 * @var string
-	 */
-	protected $cwd;
+	protected $statements = [];
 
 	/**
 	 * @var string
 	 */
-	protected $toEncoding = null;
+	protected $encoding = null;
 
 	/**
-	 * @var string
+	 * @var AdviniAdapter
 	 */
-	protected $fromEncoding = null;
+	protected $adapter;
 
 	/**
 	 * Advini constructor.
@@ -83,6 +74,48 @@ class Advini {
 	}
 
 	/**
+	 * @param StatementInterface $statementObject
+	 * @param string             $key
+	 *
+	 * @return void
+	 */
+	public function addStatement(StatementInterface $statementObject, $key = NULL) {
+		if (null === $key) {
+			$key = $statementObject->getKey();
+		}
+
+		if (true === isset($this->statements[$key])) {
+			$this->statements[$key] = null;
+			unset($this->statements[$key]);
+		}
+
+		$this->statements[$key] = $statementObject;
+	}
+
+	/**
+	 * @param string $key
+	 *
+	 * @return boolean
+	 */
+	public function hasStatement($key) {
+		return (true === isset($this->statements[$key]));
+	}
+
+	/**
+	 * @param string $key
+	 *
+	 * @return StatementInterface
+	 * @throws Exception
+	 */
+	public function getStatement($key) {
+		if (false === isset($this->statements[$key])) {
+			throw new Exception(sprintf('Cannot find statement <%s>!', $key));
+		}
+
+		return $this->statements[$key];
+	}
+
+	/**
 	 * @param string $file
 	 * @param string $charset
 	 * @param bool   $finalize
@@ -91,84 +124,28 @@ class Advini {
 	 */
 	public function getFromFile($file, $charset = null, $finalize = false) {
 		$this->assertFile($file);
-		$this->cwd = dirname($file);
+		$this->setCwd(dirname($file));
 
-		if (null !== $this->toEncoding) {
-			$this->toEncoding = $this->setEncoding($charset);
+		if (null !== $this->encoding) {
+			$this->encoding = $this->setEncoding($charset);
 		}
 
-		$configuration = $this->parseIniFile($file);
+		$this->adapter = new AdviniAdapter($this, $this->getCwd(), $this->encoding);
 
-		$this->checkImportStatement($configuration);
-		$this->checkCharsetStatement($configuration);
-		$this->extractKeys($configuration);
+		$configuration = $this->getArrayFromIniFile($file);
+
+		$this->processKeyStatements($configuration);
+		$this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
 		$this->processConfiguration($configuration, $finalize);
 
 		return $configuration;
 	}
 
 	/**
-	 * @param string $file
-	 *
-	 * @return void
+	 * @return string
 	 */
-	public function setConstantsFromFile($file) {
-		$constants = parse_ini_file($file, true);
-		$this->extractKeys($constants);
-		$this->constants = $constants;
-	}
-
-	/**
- 	 * @param array $constants
- 	 * 
- 	 * @return void
- 	 */
-	public function setConstants(array $constants) {
-		$this->constants = $constants;
-	}
-
-	/**
-	 * Extract multi named keys like "key1/key2".
-	 *
-	 * @param array $source
-	 *
-	 * @return void
-	 */
-	protected function extractKeys(array &$source) {
-		foreach ($source as $key => &$value) {
-			if (true === is_array($value)) {
-				$this->extractKeys($value);
-			}
-
-			if (false !== strpos($key, self::TOKEN_MULTI_KEY_SEPARATOR)) {
-				$key_arr = explode(self::TOKEN_MULTI_KEY_SEPARATOR, $key);
-				$last_key = array_pop($key_arr);
-				$cur_elem = &$source;
-
-				foreach ($key_arr as $key_step) {
-					if (false !== isset($cur_elem[$key_step])) {
-						$cur_elem[$key_step] = [];
-					}
-
-					$cur_elem = &$cur_elem[$key_step];
-				}
-
-				$cur_elem[$last_key] = $value;
-				unset($source[$key]);
-			}
-		}
-	}
-
-	/**
-	 * @param string $fileName
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	protected function assertFile($fileName) {
-		if (false === is_file($fileName)) {
-			throw new Exception(sprintf('Cannot find file <%s>.', $fileName));
-		}
+	public function getEncoding() {
+		return $this->encoding;
 	}
 
 	/**
@@ -182,7 +159,33 @@ class Advini {
 		if (true === is_array($configuration)) {
 			$this->throughConfiguration($configuration, $finalize);
 		} elseif (true === is_string($configuration)) {
-			$this->processValue($configuration);
+			$this->processValueStatements($configuration);
+		}
+	}
+
+	/**
+	 * @param array $configuration
+	 *
+	 * @return void
+	 */
+	protected function processKeyStatements(array &$configuration) {
+		foreach ($this->statements as $statement /** @var StatementInterface $statement */) {
+			if (true === $statement->canProcessKey($configuration)) {
+				$statement->processKey(new AdviniAdapter($this), $configuration);
+			}
+		}
+	}
+
+	/**
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	protected function processValueStatements(&$value) {
+		foreach ($this->statements as $statement /** @var StatementInterface $statement */) {
+			if (true === $statement->canProcessValue($value)) {
+				$statement->processValue(new AdviniAdapter($this), $value);
+			}
 		}
 	}
 
@@ -194,7 +197,7 @@ class Advini {
 	 * @return void
 	 */
 	protected function throughConfiguration(array &$configuration, $finalize = false) {
-		$this->checkImportStatement($configuration);
+		$this->processKeyStatements($configuration);
 
 		foreach ($configuration as $originKey => $value) {
 			$methods = explode(self::TOKEN_METHOD_SEPARATOR, $originKey);
@@ -239,147 +242,5 @@ class Advini {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	protected function processValue(&$value) {
-		if ('@' === $value{0}) {
-			if (false === $this->checkImportStatementForValue($value)) {
-				$this->checkConstantStatement($value);
-			}
-		}
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @return boolean
-	 */
-	protected function checkImportStatementForValue(&$value) {
-		$pattern = sprintf('/^%s (.+)$/', self::TOKEN_IMPORT);
-		$result = false;
-
-		if (0 < preg_match($pattern, $value, $matches)) {
-			$value = $this->importFromFile($matches[1]);
-			$result = true;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	protected function checkConstantStatement(&$value) {
-		$pattern = sprintf('/^%s (.+)$/', self::TOKEN_CONSTANT);
-
-		if (0 < preg_match($pattern, $value, $matches)) {
-			list ($key, $defaultValue) = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
-
-			if (true === isset($this->constants[$key])) {
-				$value = $this->convert($this->constants[$key]);
-			} else {
-				$value = $this->convert($defaultValue);
-
-				if (null === $value) {
-					$value = '';
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	protected function convert($value) {
-		if (null !== $this->fromEncoding) {
-			$value = mb_convert_encoding($value, $this->toEncoding, $this->fromEncoding);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * @param string $file
-	 *
-	 * @return array
-	 */
-	protected function importFromFile($file) {
-		$importFile = sprintf('%s/%s', $this->cwd, $file);
-
-		return $this->getFromFile($importFile, $this->toEncoding, true);
-	}
-
-	/**
-	 * @param string $file
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	protected function parseIniFile($file) {
-		$configuration = parse_ini_file($file, true);
-
-		if (false === $configuration) {
-			throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
-		}
-
-		return $configuration;
-	}
-
-	/**
-	 * @param array $configuration
-	 *
-	 * @return void
-	 */
-	protected function checkImportStatement(array &$configuration) {
-		if (true === isset($configuration[self::TOKEN_IMPORT])) {
-			$additionalConfiguration = $this->importFromFile($configuration[self::TOKEN_IMPORT]);
-			$configuration = array_merge($configuration, $additionalConfiguration);
-
-			unset($configuration[self::TOKEN_IMPORT]);
-		}
-	}
-
-	/**
-	 * @param array $configuration
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	protected function checkCharsetStatement(array &$configuration) {
-		if (true === isset($configuration[self::TOKEN_CHARSET])) {
-			$this->fromEncoding = $this->setEncoding($configuration[self::TOKEN_CHARSET]);
-
-			if (null === $this->toEncoding) {
-				throw new Exception(
-					sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
-				);
-			}
-
-			unset($configuration[self::TOKEN_CHARSET]);
-		}
-	}
-
-	/**
-	 * @param string $charset
-	 *
-	 * @return string
-	 */
-	protected function setEncoding($charset) {
-		$charsets = array_flip(mb_list_encodings());
-
-		if (false === isset($charsets[$charset])) {
-			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
-		}
-
-		return $charset;
 	}
 }

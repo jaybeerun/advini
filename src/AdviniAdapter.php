@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,17 +26,64 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use Exception;
+use JBR\Advini\Interfaces\StatementInterface;
+use JBR\Advini\Statements\CharsetStatement;
+use JBR\Advini\Statements\ConstantStatement;
+use JBR\Advini\Statements\ImportStatement;
+use JBR\Advini\Wrapper\AbstractWrapper;
+
 /**
  *
- *
  */
-interface WrapperInterface {
+class AdviniAdapter {
 
 	/**
-	 * @param string $methodName
-	 * @param mixed  $value
-	 *
-	 * @return mixed
+	 * @var Advini
 	 */
-	public function execute($methodName, $value);
+	private $object;
+
+	/**
+	 * @param Advini $object
+	 */
+	public function __construct(Advini $object) {
+		$this->object = $object;
+	}
+
+	/**
+	 * @param string $key
+	 * @return StatementInterface
+	 */
+	public function getStatement($key) {
+		$statement = null;
+
+		if (true === $this->object->hasStatement($key)) {
+			$statement = $this->object->getStatement($key);
+		}
+
+		return $statement;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEncoding() {
+		return $this->object->getEncoding();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCwd() {
+		return $this->object->getCwd();
+	}
+
+	/**
+	 * @param string $file
+	 *
+	 * @return Advini
+	 */
+	public function getFromFile($file) {
+		return $this->object->getFromFile($file, $this->object->getEncoding(), true);
+	}
 }

@@ -27,6 +27,8 @@
  ************************************************************************************/
 
 use JBR\Advini\Advini;
+use JBR\Advini\Statements\ConstantStatement;
+use JBR\Advini\Statements\ImportStatement;
 use JBR\Advini\Wrapper\Base;
 
 /**
@@ -58,6 +60,8 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleFileWithImport() {
 		$iniFile = new Advini();
+		$iniFile->addStatement(new ImportStatement());
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImport.ini');
 		$this->assertEquals($this->result, serialize($configuration));
 	}
@@ -67,7 +71,13 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleImportFileWithConstants() {
 		$iniFile = new Advini();
-		$iniFile->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement(new ImportStatement());
+
+		/** @var ConstantStatement $const */
+		$const = new ConstantStatement();
+		$const->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement($const);
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportForConstants.ini');
 		$this->assertEquals($this->result, serialize($configuration));
 	}
@@ -77,7 +87,12 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleFileWithConstants() {
 		$iniFile = new Advini();
-		$iniFile->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+
+		/** @var ConstantStatement $const */
+		$const = new ConstantStatement();
+		$const->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement($const);
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleForConstants.ini');
 		$this->assertEquals($this->result, serialize($configuration));
 	}
@@ -87,7 +102,12 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleFileWithConstantsAndMethods() {
 		$iniFile = new Advini(new Base());
-		$iniFile->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+
+		/** @var ConstantStatement $const */
+		$const = new ConstantStatement();
+		$const->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement($const);
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleForConstantsWithMethod.ini');
 		$this->assertEquals($this->resultWithMethod, serialize($configuration));
 	}
@@ -97,7 +117,13 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleImportFileWithConstantsAndMethods() {
 		$iniFile = new Advini(new Base());
-		$iniFile->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement(new ImportStatement());
+
+		/** @var ConstantStatement $const */
+		$const = new ConstantStatement();
+		$const->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addStatement($const);
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportForConstantsWithMethod.ini');
 		$this->assertEquals($this->resultWithMethod, serialize($configuration));
 	}
@@ -107,6 +133,8 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testSimpleImportAsKeyFileWithConstantsAndMethods() {
 		$iniFile = new Advini();
+		$iniFile->addStatement(new ImportStatement());
+
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportAsKey.ini');
 		$this->assertEquals($this->result, serialize($configuration));
 	}

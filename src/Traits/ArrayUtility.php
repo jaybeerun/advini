@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini\Traits;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -28,15 +28,39 @@
 
 /**
  *
- *
  */
-interface WrapperInterface {
+trait ArrayUtility {
 
 	/**
-	 * @param string $methodName
-	 * @param mixed  $value
+	 * Extract multi named keys like "key1/key2".
 	 *
-	 * @return mixed
+	 * @param array $source
+	 * @param       $separator
+	 *
+	 * @return void
 	 */
-	public function execute($methodName, $value);
+	protected function extractKeys(array &$source, $separator) {
+		foreach ($source as $key => &$value) {
+			if (true === is_array($value)) {
+				$this->extractKeys($value, $separator);
+			}
+
+			if (false !== strpos($key, $separator)) {
+				$key_arr = explode($separator, $key);
+				$last_key = array_pop($key_arr);
+				$cur_elem = &$source;
+
+				foreach ($key_arr as $key_step) {
+					if (false !== isset($cur_elem[$key_step])) {
+						$cur_elem[$key_step] = [];
+					}
+
+					$cur_elem = &$cur_elem[$key_step];
+				}
+
+				$cur_elem[$last_key] = $value;
+				unset($source[$key]);
+			}
+		}
+	}
 }

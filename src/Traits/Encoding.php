@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini\Traits;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,17 +26,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use Exception;
+
 /**
  *
- *
  */
-interface WrapperInterface {
+trait Encoding {
 
 	/**
-	 * @param string $methodName
-	 * @param mixed  $value
+	 * @param string $charset
 	 *
-	 * @return mixed
+	 * @return string
+	 * @throws Exception
 	 */
-	public function execute($methodName, $value);
+	protected function setEncoding($charset) {
+		$charsets = array_flip(mb_list_encodings());
+
+		if (false === isset($charsets[$charset])) {
+			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
+		}
+
+		return $charset;
+	}
 }
