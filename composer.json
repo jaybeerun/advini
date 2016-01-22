@@ -12,10 +12,12 @@
       "role": "Developer"
     }
   ],
-  "require-dev": {
-    "phpunit/phpunit": "4.8.*",
+  "require": {
     "php": ">5.4.10",
     "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.8.*"
   },
   "autoload": {
     "psr-4": {
