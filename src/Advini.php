@@ -27,9 +27,8 @@
  ************************************************************************************/
 
 use Exception;
-use JBR\Advini\Interfaces\StatementInterface;
+use JBR\Advini\Interfaces\InstructorInterface;
 use JBR\Advini\Traits\ArrayUtility;
-use JBR\Advini\Traits\Encoding;
 use JBR\Advini\Traits\FileUtility;
 use JBR\Advini\Wrapper\AbstractWrapper;
 
@@ -38,7 +37,7 @@ use JBR\Advini\Wrapper\AbstractWrapper;
  */
 class Advini {
 
-	use Encoding, ArrayUtility, FileUtility;
+	use ArrayUtility, FileUtility;
 
 	const TOKEN_METHOD_SEPARATOR = ':';
 
@@ -52,12 +51,7 @@ class Advini {
 	/**
 	 * @var array
 	 */
-	protected $statements = [];
-
-	/**
-	 * @var string
-	 */
-	protected $encoding = null;
+	protected $instructions = [];
 
 	/**
 	 * @var AdviniAdapter
@@ -74,22 +68,26 @@ class Advini {
 	}
 
 	/**
-	 * @param StatementInterface $statementObject
-	 * @param string             $key
+	 * @param InstructorInterface $instructor
+	 * @param string              $namespace
 	 *
 	 * @return void
 	 */
-	public function addStatement(StatementInterface $statementObject, $key = NULL) {
-		if (null === $key) {
-			$key = $statementObject->getKey();
+	public function addInstructor(InstructorInterface $instructor, $namespace = null) {
+		if (null === $namespace) {
+			$namespace = get_class($instructor);
 		}
 
-		if (true === isset($this->statements[$key])) {
-			$this->statements[$key] = null;
-			unset($this->statements[$key]);
+		if (false === class_exists($namespace)) {
+			throw new Exception(sprintf('Cannot find class <%s> with dependency injection for instructor!', $namespace));
 		}
 
-		$this->statements[$key] = $statementObject;
+		if (true === isset($this->instructions[$namespace])) {
+			$this->instructions[$namespace] = null;
+			unset($this->instructions[$namespace]);
+		}
+
+		$this->instructions[$namespace] = $instructor;
 	}
 
 	/**
@@ -97,55 +95,43 @@ class Advini {
 	 *
 	 * @return boolean
 	 */
-	public function hasStatement($key) {
-		return (true === isset($this->statements[$key]));
+	public function hasInstructor($key) {
+		return (true === isset($this->instructions[$key]));
 	}
 
 	/**
 	 * @param string $key
 	 *
-	 * @return StatementInterface
+	 * @return InstructorInterface
 	 * @throws Exception
 	 */
-	public function getStatement($key) {
-		if (false === isset($this->statements[$key])) {
-			throw new Exception(sprintf('Cannot find statement <%s>!', $key));
+	public function getInstructor($key) {
+		if (false === isset($this->instructions[$key])) {
+			throw new Exception(sprintf('Cannot find instructor <%s>!', $key));
 		}
 
-		return $this->statements[$key];
+		return $this->instructions[$key];
 	}
 
 	/**
 	 * @param string $file
-	 * @param string $charset
 	 * @param bool   $finalize
 	 *
 	 * @return array
 	 */
-	public function getFromFile($file, $charset = null, $finalize = false) {
+	public function getFromFile($file, $finalize = false) {
 		$this->assertFile($file);
 		$this->setCwd(dirname($file));
 
-		if (null !== $this->encoding) {
-			$this->encoding = $this->setEncoding($charset);
-		}
-
-		$this->adapter = new AdviniAdapter($this, $this->getCwd(), $this->encoding);
+		$this->adapter = new AdviniAdapter($this);
 
 		$configuration = $this->getArrayFromIniFile($file);
 
-		$this->processKeyStatements($configuration);
+		$this->processKeyInstructions($configuration);
 		$this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
 		$this->processConfiguration($configuration, $finalize);
 
 		return $configuration;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getEncoding() {
-		return $this->encoding;
 	}
 
 	/**
@@ -168,10 +154,10 @@ class Advini {
 	 *
 	 * @return void
 	 */
-	protected function processKeyStatements(array &$configuration) {
-		foreach ($this->statements as $statement /** @var StatementInterface $statement */) {
-			if (true === $statement->canProcessKey($configuration)) {
-				$statement->processKey(new AdviniAdapter($this), $configuration);
+	protected function processKeyInstructions(array &$configuration) {
+		foreach ($this->instructions as $instructor /** @var InstructorInterface $instructor */) {
+			if (true === $instructor->canProcessKey($configuration)) {
+				$instructor->processKey(new AdviniAdapter($this), $configuration);
 			}
 		}
 	}
@@ -182,9 +168,9 @@ class Advini {
 	 * @return void
 	 */
 	protected function processValueStatements(&$value) {
-		foreach ($this->statements as $statement /** @var StatementInterface $statement */) {
-			if (true === $statement->canProcessValue($value)) {
-				$statement->processValue(new AdviniAdapter($this), $value);
+		foreach ($this->instructions as $instructor /** @var InstructorInterface $instructor */) {
+			if (true === $instructor->canProcessValue($value)) {
+				$instructor->processValue(new AdviniAdapter($this), $value);
 			}
 		}
 	}
@@ -197,7 +183,7 @@ class Advini {
 	 * @return void
 	 */
 	protected function throughConfiguration(array &$configuration, $finalize = false) {
-		$this->processKeyStatements($configuration);
+		$this->processKeyInstructions($configuration);
 
 		foreach ($configuration as $originKey => $value) {
 			$methods = explode(self::TOKEN_METHOD_SEPARATOR, $originKey);

@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Statements;
+<?php namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -29,25 +29,48 @@
 use Exception;
 use JBR\Advini\AdviniAdapter;
 use JBR\Advini\Interfaces\ConvertInterface;
-use JBR\Advini\Interfaces\StatementInterface;
-use JBR\Advini\Traits\Encoding;
+use JBR\Advini\Interfaces\InstructorInterface;
 
 /**
  *
  *
  */
-class CharsetStatement implements StatementInterface, ConvertInterface {
-
-	use Encoding;
+class CharsetInstructor implements InstructorInterface, ConvertInterface {
 
 	const TOKEN = '@charset';
-
-	const KEY = 'charset';
 
 	/**
 	 * @var string
 	 */
 	protected $fromEncoding = null;
+
+	/**
+	 * @var string
+	 */
+	protected $toEncoding = null;
+
+	/**
+	 * @param string $charset
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	protected function setEncoding($charset) {
+		$charsets = array_flip(mb_list_encodings());
+
+		if (false === isset($charsets[$charset])) {
+			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
+		}
+
+		return $charset;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEncoding() {
+		return $this->toEncoding;
+	}
 
 	/**
 	 * @param mixed $key
@@ -78,7 +101,7 @@ class CharsetStatement implements StatementInterface, ConvertInterface {
 		if (true === isset($configuration[self::TOKEN])) {
 			$this->fromEncoding = $this->setEncoding($configuration[self::TOKEN]);
 
-			if (null === $adapter->getEncoding()) {
+			if (null === $this->getEncoding()) {
 				throw new Exception(
 					sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
 				);
@@ -86,22 +109,6 @@ class CharsetStatement implements StatementInterface, ConvertInterface {
 
 			unset($configuration[self::TOKEN]);
 		}
-	}
-
-	/**
-	 * @param string $charset
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	protected function setEncoding($charset) {
-		$charsets = array_flip(mb_list_encodings());
-
-		if (false === isset($charsets[$charset])) {
-			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
-		}
-
-		return $charset;
 	}
 
 	/**
@@ -122,16 +129,9 @@ class CharsetStatement implements StatementInterface, ConvertInterface {
 	 */
 	public function convert(AdviniAdapter $adapter, $value) {
 		if (null !== $this->fromEncoding) {
-			$value = mb_convert_encoding($value, $adapter->getEncoding(), $this->fromEncoding);
+			$value = mb_convert_encoding($value, $this->getEncoding(), $this->fromEncoding);
 		}
 
 		return $value;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getKey() {
-		return self::KEY;
 	}
 }

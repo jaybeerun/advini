@@ -1,4 +1,5 @@
-<?php
+<?php namespace JBR\Advini\Traits;
+
 /**********************************************************************
  *  Copyright notice
  *
@@ -22,11 +23,11 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  **********************************************************************/
 
-namespace JBR\Advini\Traits;
-
-
 use Exception;
 
+/**
+ *
+ */
 trait FileUtility {
 
 	/**

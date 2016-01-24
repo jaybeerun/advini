@@ -30,9 +30,7 @@ use Exception;
 use JBR\Advini\Interfaces\WrapperInterface;
 
 /**
- * Class AbstractWrapper
  *
- * @package JBR\Advini\Wrapper
  */
 class AbstractWrapper implements WrapperInterface {
 

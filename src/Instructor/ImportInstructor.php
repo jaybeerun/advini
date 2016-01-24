@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Statements;
+<?php namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,30 +26,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Interfaces\ConvertInterface;
-use JBR\Advini\Interfaces\StatementInterface;
-use JBR\Advini\Traits\ArrayUtility;
+use JBR\Advini\Interfaces\InstructorInterface;
 
 /**
  *
  *
  */
-class ConstantStatement implements StatementInterface {
+class ImportInstructor implements InstructorInterface {
 
-	use ArrayUtility;
-
-	const TOKEN = '@const';
-
-	const TOKEN_DEFAULT_VALUE = ':';
-
-	const KEY = 'const';
-
-	/**
-	 * @var array
-	 */
-	protected $constants = [];
+	const TOKEN = '@import';
 
 	/**
 	 * @param mixed $key
@@ -57,7 +43,7 @@ class ConstantStatement implements StatementInterface {
 	 * @return bool
 	 */
 	public function canProcessKey($key) {
-		return false;
+		return (true === is_array($key));
 	}
 
 	/**
@@ -71,32 +57,7 @@ class ConstantStatement implements StatementInterface {
 
 	/**
 	 * @param AdviniAdapter $adapter
-	 * @param array         $configuration
-	 *
-	 * @return void
-	 */
-	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-
-	}
-
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return string
-	 */
-	protected function convert(AdviniAdapter $adapter, $value) {
-		if (null !== ($statement = $adapter->getStatement(CharsetStatement::KEY))) {
-			/** @var ConvertInterface $statement */
-			$value = $statement->convert($adapter, $value);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
+	 * @param string $value
 	 *
 	 * @return void
 	 */
@@ -104,45 +65,34 @@ class ConstantStatement implements StatementInterface {
 		$pattern = sprintf('/^%s (.+)$/', self::TOKEN);
 
 		if (0 < preg_match($pattern, $value, $matches)) {
-			$parts = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
-			$key = $parts[0];
-
-			if (true === isset($this->constants[$key])) {
-				$value = $this->convert($adapter, $this->constants[$key]);
-			} elseif (true === isset($parts[1])) {
-				$value = $this->convert($adapter, $parts[1]);
-
-				if (null === $value) {
-					$value = '';
-				}
-			}
+			$value = $this->importFromFile($adapter, $matches[1]);
 		}
 	}
 
 	/**
+	 * @param AdviniAdapter $adapter
 	 * @param string $file
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function setConstantsFromFile($file) {
-		$constants = parse_ini_file($file, true);
-		$this->extractKeys($constants, Advini::TOKEN_MULTI_KEY_SEPARATOR);
-		$this->constants = array_merge($this->constants, $constants);
+	protected function importFromFile(AdviniAdapter $adapter, $file) {
+		$importFile = sprintf('%s/%s', $adapter->getCwd(), $file);
+
+		return $adapter->getFromFile($importFile);
 	}
 
 	/**
- 	 * @param array $constants
- 	 *
- 	 * @return void
- 	 */
-	public function setConstants(array $constants) {
-		$this->constants = array_merge($this->constants, $constants);
-	}
-
-	/**
-	 * @return string
+	 * @param AdviniAdapter $adapter
+	 * @param array  $configuration
+	 *
+	 * @return boolean
 	 */
-	public function getKey() {
-		return self::KEY;
+	public function processKey(AdviniAdapter $adapter, array &$configuration) {
+		if (true === isset($configuration[self::TOKEN])) {
+			$additionalConfiguration = $this->importFromFile($adapter, $configuration[self::TOKEN]);
+			$configuration = array_merge($configuration, $additionalConfiguration);
+
+			unset($configuration[self::TOKEN]);
+		}
 	}
 }

@@ -26,12 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
-use JBR\Advini\Interfaces\StatementInterface;
-use JBR\Advini\Statements\CharsetStatement;
-use JBR\Advini\Statements\ConstantStatement;
-use JBR\Advini\Statements\ImportStatement;
-use JBR\Advini\Wrapper\AbstractWrapper;
+use JBR\Advini\Interfaces\InstructorInterface;
 
 /**
  *
@@ -52,23 +47,16 @@ class AdviniAdapter {
 
 	/**
 	 * @param string $key
-	 * @return StatementInterface
+	 * @return InstructorInterface
 	 */
-	public function getStatement($key) {
-		$statement = null;
+	public function getInstructor($key) {
+		$instructor = null;
 
-		if (true === $this->object->hasStatement($key)) {
-			$statement = $this->object->getStatement($key);
+		if (true === $this->object->hasInstructor($key)) {
+			$instructor = $this->object->getInstructor($key);
 		}
 
-		return $statement;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getEncoding() {
-		return $this->object->getEncoding();
+		return $instructor;
 	}
 
 	/**
@@ -84,6 +72,6 @@ class AdviniAdapter {
 	 * @return Advini
 	 */
 	public function getFromFile($file) {
-		return $this->object->getFromFile($file, $this->object->getEncoding(), true);
+		return $this->object->getFromFile($file, true);
 	}
 }

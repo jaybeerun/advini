@@ -32,12 +32,7 @@ use JBR\Advini\AdviniAdapter;
  *
  *
  */
-interface StatementInterface {
-
-	/**
-	 * @return string
-	 */
-	public function getKey();
+interface InstructorInterface {
 
 	/**
 	 * @param mixed $key
