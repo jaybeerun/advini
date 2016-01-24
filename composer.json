@@ -27,7 +27,7 @@
 
   "autoload": {
     "psr-4": {
-      "JBR\\Advini\\": "src/"
+      "JBR\\Advini\\": "Classes/"
     }
   }
 }
