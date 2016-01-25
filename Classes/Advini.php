@@ -71,6 +71,7 @@ class Advini {
 	 * @param InstructorInterface $instructor
 	 * @param string              $namespace
 	 *
+	 * @throws Exception
 	 * @return void
 	 */
 	public function addInstructor(InstructorInterface $instructor, $namespace = null) {
