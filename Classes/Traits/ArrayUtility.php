@@ -51,14 +51,13 @@ trait ArrayUtility {
 				$cur_elem = &$source;
 
 				foreach ($key_arr as $key_step) {
-					if (false !== isset($cur_elem[$key_step])) {
+					if (false === isset($cur_elem[$key_step])) {
 						$cur_elem[$key_step] = [];
 					}
-
 					$cur_elem = &$cur_elem[$key_step];
 				}
 
-				$cur_elem[$last_key] = $value;
+				$cur_elem[$last_key] = &$value;
 				unset($source[$key]);
 			}
 		}
