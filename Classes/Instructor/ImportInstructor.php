@@ -83,9 +83,9 @@ class ImportInstructor implements InstructorInterface {
 
 	/**
 	 * @param AdviniAdapter $adapter
-	 * @param array  $configuration
+	 * @param array         $configuration
 	 *
-	 * @return boolean
+	 * @return string
 	 */
 	public function processKey(AdviniAdapter $adapter, array &$configuration) {
 		if (true === isset($configuration[self::TOKEN])) {
@@ -94,5 +94,7 @@ class ImportInstructor implements InstructorInterface {
 
 			unset($configuration[self::TOKEN]);
 		}
+
+		return null;
 	}
 }

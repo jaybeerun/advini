@@ -53,7 +53,7 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return bool
 	 */
 	public function canProcessKey($key) {
-		return false;
+		return (true === is_array($key));
 	}
 
 	/**
@@ -72,7 +72,28 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processKey(AdviniAdapter $adapter, array &$configuration) {
+		// You cannot define these chars: $ { } ( )
+		$pattern = '/<<( *[^<>]+ *)>>/';
+		$newConfiguration = [];
 
+		foreach ($configuration as $keyValue => &$value) {
+			while (0 < preg_match($pattern, $keyValue, $matches)) {
+				$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
+				$key = $parts[0];
+
+				if (true === isset($this->constants[$key])) {
+					$keyValue = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $keyValue);
+				} elseif (true === isset($parts[1])) {
+					$keyValue = str_replace($matches[0], $this->convert($adapter, $parts[1]), $keyValue);
+				} else {
+					$keyValue = $matches[1];
+				}
+			}
+
+			$newConfiguration[$keyValue] = $value;
+		}
+
+		$configuration = $newConfiguration;
 	}
 
 	/**
@@ -97,7 +118,9 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
+		// You have to define with double $$, because PHP can interpret this as variable (result can be empty)
 		$pattern = '/\\$\\$(const(ant)?)?\\{( *[^\\{\\}]+ *)\\}/';
+
 		while (0 < preg_match($pattern, $value, $matches)) {
 			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[3]), 2);
 			$key = $parts[0];

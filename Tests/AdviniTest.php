@@ -49,6 +49,11 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 	protected $resultWithMethod = 'a:1:{s:8:"category";a:1:{s:11:"subcategory";a:1:{s:4:"key1";a:1:{s:4:"key2";s:32:"2063c1608d6e0baf80249c42e2be5804";}}}}';
 
 	/**
+	 * @var string
+	 */
+	protected $resultWithKeyConstant = 'a:1:{s:8:"category";a:1:{s:16:"subcategory_temp";a:1:{s:4:"key1";a:1:{s:4:"key2";s:5:"value";}}}}';
+
+	/**
 	 *
 	 */
 	public function testSimpleFile() {
@@ -139,5 +144,21 @@ class AdviniTest extends PHPUnit_Framework_TestCase {
 
 		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportAsKey.ini');
 		$this->assertEquals($this->result, serialize($configuration));
+	}
+
+	/**
+	 *
+	 */
+	public function testSimpleImportAsKeyFileWithConstantsAndMethodsAndDynamicKey() {
+		$iniFile = new Advini();
+		$iniFile->addInstructor(new ImportInstructor());
+
+		/** @var ConstantInstructor $const */
+		$const = new ConstantInstructor();
+		$const->setConstantsFromFile(__DIR__ . '/res/constants.ini');
+		$iniFile->addInstructor($const);
+
+		$configuration = $iniFile->getFromFile(__DIR__ . '/res/simpleImportForConstantsAndDynamicKey.ini');
+		$this->assertEquals($this->resultWithKeyConstant, serialize($configuration));
 	}
 }

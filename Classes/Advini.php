@@ -136,7 +136,7 @@ class Advini {
 	}
 
 	/**
-	 * @param mixed $configuration
+	 * @param mixed   $configuration
 	 * @param boolean $finalize
 	 *
 	 * @throws Exception
@@ -177,7 +177,7 @@ class Advini {
 	}
 
 	/**
-	 * @param array $configuration
+	 * @param array   $configuration
 	 * @param boolean $finalize
 	 *
 	 * @throws Exception
@@ -220,12 +220,14 @@ class Advini {
 
 		$this->processConfiguration($value, $finalize);
 
-		try {
-			$result = $this->wrapper->execute($methodName, $value);
-		} catch (Exception $e) {
-			throw new Exception(
-				sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
-			);
+		if (null !== $this->wrapper) {
+			try {
+				$result = $this->wrapper->execute($methodName, $value);
+			} catch (Exception $e) {
+				throw new Exception(
+					sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
+				);
+			}
 		}
 
 		return $result;
