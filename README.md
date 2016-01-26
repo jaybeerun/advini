@@ -24,18 +24,25 @@ property3 = value3
 It supports:
 
 - defining complex keys and sections
+
 	```ini
 	category/property = value
 	```
+
 - importing any INI file
+
 	```ini
-	property = @import default.ini
+	property = @import[ default.ini ]
 	```
+
 - including constants (from INI file)
+
 	```ini
-	property = @const 
+	property = $${ key } 
 	```
+
 - calling methods before setting
+
 	```ini
 	property:sha1 = geheim1234 
 	```
@@ -83,7 +90,7 @@ Importing any INI file
 
 Usage:
 ```ini
-{key} = @import {file}
+{key} = @import[ [file] ]
 ```
 
 
@@ -98,7 +105,7 @@ var_dump($configuration);
 
 INI "local.ini":
 ```ini
-category = @import import.ini
+category = @import[ import.ini ]
 ```
 
 INI "import.ini":
@@ -124,15 +131,17 @@ Including constants
 
 Usage:
 ```ini
-{key} = @const {constant}
+{key} = $${ [constant] }
 ```
 
 PHP:
 ```php
 use JBR\Advini\Advini;
+use JBR\Advini\Instructor\ConstantInstructor;
 
 $ini = new Advini();
-$ini->setConstantsFromFile("constants.ini");
+$const = $ini->getInstructor(ConstantInstructor::class);
+$const->setConstantsFromFile("constants.ini");
 $configuration = $ini->getFromFile("local.ini");
 var_dump($configuration);
 ```
@@ -146,7 +155,7 @@ key = value
 INI "local.ini":
 ```ini
 [category/subcategory]
-key = @const key
+key = $${ key }
 ```
 
 Resulted output:
