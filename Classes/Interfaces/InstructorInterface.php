@@ -43,7 +43,7 @@ interface InstructorInterface {
 
 	/**
 	 * @param AdviniAdapter $adapter
-	 * @param array $configuration
+	 * @param array         $configuration
 	 *
 	 * @return void
 	 */

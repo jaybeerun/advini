@@ -109,6 +109,8 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface {
 
 			unset($configuration[self::TOKEN]);
 		}
+
+		return null;
 	}
 
 	/**
