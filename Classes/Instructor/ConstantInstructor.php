@@ -40,8 +40,6 @@ class ConstantInstructor implements InstructorInterface {
 
 	use ArrayUtility;
 
-	const TOKEN = '@const';
-
 	const TOKEN_DEFAULT_VALUE = ':';
 
 	/**
@@ -99,16 +97,15 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		$pattern = sprintf('/^%s (.+)$/', self::TOKEN);
-
-		if (0 < preg_match($pattern, $value, $matches)) {
-			$parts = explode(self::TOKEN_DEFAULT_VALUE, $matches[1], 2);
+		$pattern = '/\\$\\$(const(ant)?)?\\{( *[^\\{\\}]+ *)\\}/';
+		while (0 < preg_match($pattern, $value, $matches)) {
+			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[3]), 2);
 			$key = $parts[0];
 
 			if (true === isset($this->constants[$key])) {
-				$value = $this->convert($adapter, $this->constants[$key]);
+				$value = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $value);
 			} elseif (true === isset($parts[1])) {
-				$value = $this->convert($adapter, $parts[1]);
+				$value = str_replace($matches[0], $this->convert($adapter, $parts[1]), $value);
 
 				if (null === $value) {
 					$value = '';
