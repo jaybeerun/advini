@@ -62,10 +62,10 @@ class ImportInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		$pattern = sprintf('/^%s (.+)$/', self::TOKEN);
+		$pattern = '/@(import)?\\[( *[^\\[\\]]+ *)\\]/';
 
 		if (0 < preg_match($pattern, $value, $matches)) {
-			$value = $this->importFromFile($adapter, $matches[1]);
+			$value = $this->importFromFile($adapter, trim($matches[2]));
 		}
 	}
 
