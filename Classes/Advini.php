@@ -59,12 +59,31 @@ class Advini {
 	protected $adapter;
 
 	/**
+	 * @var boolean
+	 */
+	protected $disableExtractKeys;
+
+	/**
 	 * Advini constructor.
 	 *
 	 * @param AbstractWrapper $methodsObject
 	 */
 	public function __construct(AbstractWrapper $methodsObject = null) {
 		$this->wrapper = $methodsObject;
+	}
+
+	/**
+	 * @return void
+	 */
+	public function disableExtractKeys() {
+		$this->disableExtractKeys = true;
+	}
+
+	/**
+	 * @return void
+	 */
+	public function enableExtractKeys() {
+		$this->disableExtractKeys = false;
 	}
 
 	/**
@@ -129,7 +148,11 @@ class Advini {
 		$configuration = $this->getArrayFromIniFile($file);
 
 		$this->processKeyInstructions($configuration);
-		$this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
+
+		if (false === $this->disableExtractKeys) {
+			$this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
+		}
+
 		$this->processConfiguration($configuration, $finalize);
 
 		return $configuration;
