@@ -122,7 +122,7 @@ class ConstantInstructor implements InstructorInterface {
 		$pattern = '/<<( *[^<>]+ *)>>/';
 
 		while (0 < preg_match($pattern, $value, $matches)) {
-			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[3]), 2);
+			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
 			$key = $parts[0];
 
 			if (true === isset($this->constants[$key])) {
