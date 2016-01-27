@@ -118,8 +118,8 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		// You have to define with double $$, because PHP can interpret this as variable (result can be empty)
-		$pattern = '/\\$\\$(const(ant)?)?\\{( *[^\\{\\}]+ *)\\}/';
+		// You cannot define these chars: $ { } ( )
+		$pattern = '/<<( *[^<>]+ *)>>/';
 
 		while (0 < preg_match($pattern, $value, $matches)) {
 			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[3]), 2);

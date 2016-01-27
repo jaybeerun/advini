@@ -38,7 +38,7 @@ It supports:
 - including constants (from INI file)
 
 	```ini
-	property = $${ key } 
+	property = << key >> 
 	```
 
 - calling methods before setting
@@ -131,7 +131,7 @@ Including constants
 
 Usage:
 ```ini
-{key} = $${ [constant] }
+{key} = << [constant] >>
 ```
 
 PHP:
@@ -155,7 +155,7 @@ key = value
 INI "local.ini":
 ```ini
 [category/subcategory]
-key = $${ key }
+key = << key >>
 ```
 
 Resulted output:
