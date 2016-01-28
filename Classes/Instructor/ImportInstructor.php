@@ -35,7 +35,7 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class ImportInstructor implements InstructorInterface {
 
-	const TOKEN = '@import';
+	const PROCESS_TOKEN = '@import';
 
 	/**
 	 * @param mixed $key
@@ -52,7 +52,7 @@ class ImportInstructor implements InstructorInterface {
 	 * @return bool
 	 */
 	public function canProcessValue($value) {
-		return (true === is_string($value));
+		return ((true === is_string($value)) && (self::PROCESS_TOKEN === substr($value, 0, strlen(self::PROCESS_TOKEN))));
 	}
 
 	/**
@@ -62,11 +62,8 @@ class ImportInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		$pattern = '/@(import)?\\[( *[^\\[\\]]+ *)\\]/';
-
-		if (0 < preg_match($pattern, $value, $matches)) {
-			$value = $this->importFromFile($adapter, trim($matches[2]));
-		}
+		$matches = $adapter->matchValue($value, self::PROCESS_TOKEN, '\\[( *[^\\[\\]]+ *)\\]');
+		$value = $this->importFromFile($adapter, trim($matches[1]));
 	}
 
 	/**
@@ -88,13 +85,20 @@ class ImportInstructor implements InstructorInterface {
 	 * @return string
 	 */
 	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		if (true === isset($configuration[self::TOKEN])) {
-			$additionalConfiguration = $this->importFromFile($adapter, $configuration[self::TOKEN]);
+		if (true === isset($configuration[self::PROCESS_TOKEN])) {
+			$additionalConfiguration = $this->importFromFile($adapter, $configuration[self::PROCESS_TOKEN]);
 			$configuration = array_merge($configuration, $additionalConfiguration);
 
-			unset($configuration[self::TOKEN]);
+			unset($configuration[self::PROCESS_TOKEN]);
 		}
 
 		return null;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProcessToken() {
+		return self::PROCESS_TOKEN;
 	}
 }

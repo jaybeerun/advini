@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use Exception;
 use JBR\Advini\Interfaces\InstructorInterface;
 
 /**
@@ -73,5 +74,46 @@ class AdviniAdapter {
 	 */
 	public function getFromFile($file) {
 		return $this->object->getFromFile($file, true);
+	}
+
+	/**
+	 * @param $pattern
+	 * @param $value
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	protected function match($pattern, $value) {
+		if (1 !== preg_match($pattern, $value, $matches)) {
+			throw new Exception(sprintf('Cannot parse instructor for <%s>', $value));
+		}
+
+		return $matches;
+	}
+
+	/**
+	 * @param string $value
+	 * @param string $token
+	 * @param string $pattern
+	 *
+	 * @return array
+	 */
+	public function matchNextValue($value, $token, $pattern) {
+		$pattern = sprintf('/%s%s/', $token, $pattern);
+
+		return $this->match($pattern, $value);
+	}
+
+	/**
+	 * @param string $value
+	 * @param string $token
+	 * @param string $pattern
+	 *
+	 * @return array
+	 */
+	public function matchValue($value, $token, $pattern) {
+		$pattern = sprintf('/^%s%s$/', $token, $pattern);
+
+		return $this->match($pattern, $value);
 	}
 }

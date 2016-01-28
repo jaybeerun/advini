@@ -35,6 +35,11 @@ use JBR\Advini\AdviniAdapter;
 interface InstructorInterface {
 
 	/**
+	 * @return string
+	 */
+	public function getProcessToken();
+
+	/**
 	 * @param mixed $key
 	 *
 	 * @return bool

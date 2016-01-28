@@ -40,6 +40,8 @@ class ConstantInstructor implements InstructorInterface {
 
 	use ArrayUtility;
 
+	const PROCESS_TOKEN = '<<';
+
 	const TOKEN_DEFAULT_VALUE = ':';
 
 	/**
@@ -62,7 +64,7 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return bool
 	 */
 	public function canProcessValue($value) {
-		return (true === is_string($value));
+		return ((true === is_string($value)) && (FALSE !== strpos($value, self::PROCESS_TOKEN)));
 	}
 
 	/**
@@ -72,12 +74,12 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		// You cannot define these chars: $ { } ( )
-		$pattern = '/<<( *[^<>]+ *)>>/';
 		$newConfiguration = [];
 
 		foreach ($configuration as $keyValue => &$value) {
-			while (0 < preg_match($pattern, $keyValue, $matches)) {
+			while (FALSE !== strpos($keyValue, self::PROCESS_TOKEN)) {
+				// You cannot define these chars: $ { } ( )
+				$matches = $adapter->matchNextValue($keyValue, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
 				$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
 				$key = $parts[0];
 
@@ -118,10 +120,9 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		// You cannot define these chars: $ { } ( )
-		$pattern = '/<<( *[^<>]+ *)>>/';
-
-		while (0 < preg_match($pattern, $value, $matches)) {
+		while (self::PROCESS_TOKEN === substr($value, 0, strlen(self::PROCESS_TOKEN))) {
+			// You cannot define these chars: $ { } ( )
+			$matches = $adapter->matchNextValue($value, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
 			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
 			$key = $parts[0];
 
@@ -155,5 +156,12 @@ class ConstantInstructor implements InstructorInterface {
  	 */
 	public function setConstants(array $constants) {
 		$this->constants = array_merge($this->constants, $constants);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProcessToken() {
+		return self::PROCESS_TOKEN;
 	}
 }
