@@ -61,7 +61,7 @@ class Advini {
 	/**
 	 * @var boolean
 	 */
-	protected $disableExtractKeys;
+	protected $disableExtractKeys = false;
 
 	/**
 	 * Advini constructor.
