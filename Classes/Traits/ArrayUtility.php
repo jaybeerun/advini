@@ -57,7 +57,7 @@ trait ArrayUtility {
 					$cur_elem = &$cur_elem[$key_step];
 				}
 
-				$cur_elem[$last_key] = &$value;
+				$cur_elem[$last_key] = $value;
 				unset($source[$key]);
 			}
 		}

@@ -77,8 +77,8 @@ class AdviniAdapter {
 	}
 
 	/**
-	 * @param $pattern
-	 * @param $value
+	 * @param string $pattern
+	 * @param string $value
 	 *
 	 * @return array
 	 * @throws Exception

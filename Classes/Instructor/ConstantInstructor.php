@@ -120,7 +120,7 @@ class ConstantInstructor implements InstructorInterface {
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
-		while (self::PROCESS_TOKEN === substr($value, 0, strlen(self::PROCESS_TOKEN))) {
+		while (FALSE !== strpos($value, self::PROCESS_TOKEN)) {
 			// You cannot define these chars: $ { } ( )
 			$matches = $adapter->matchNextValue($value, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
 			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
