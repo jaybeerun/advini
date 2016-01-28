@@ -102,6 +102,20 @@ class Advini {
 			throw new Exception(sprintf('Cannot find class <%s> with dependency injection for instructor!', $namespace));
 		}
 
+		$tokenValue = $instructor->getProcessToken();
+
+		foreach ($this->instructions as $instruction /** @var InstructorInterface $instruction */) {
+			if ($instruction->canProcessValue($tokenValue)) {
+				throw new Exception(
+					sprintf(
+						'Cannot add instructor <%s> because already added instructor <%s> can process the token value',
+						$namespace,
+						get_class($instruction)
+					)
+				);
+			}
+		}
+
 		if (true === isset($this->instructions[$namespace])) {
 			$this->instructions[$namespace] = null;
 			unset($this->instructions[$namespace]);

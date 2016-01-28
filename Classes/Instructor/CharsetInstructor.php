@@ -37,7 +37,7 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class CharsetInstructor implements InstructorInterface, ConvertInterface {
 
-	const TOKEN = '@charset';
+	const PROCESS_TOKEN = '@charset';
 
 	/**
 	 * @var string
@@ -98,8 +98,8 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface {
 	 * @throws Exception
 	 */
 	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		if (true === isset($configuration[self::TOKEN])) {
-			$this->fromEncoding = $this->setEncoding($configuration[self::TOKEN]);
+		if (true === isset($configuration[self::PROCESS_TOKEN])) {
+			$this->fromEncoding = $this->setEncoding($configuration[self::PROCESS_TOKEN]);
 
 			if (null === $this->getEncoding()) {
 				throw new Exception(
@@ -107,7 +107,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface {
 				);
 			}
 
-			unset($configuration[self::TOKEN]);
+			unset($configuration[self::PROCESS_TOKEN]);
 		}
 
 		return null;
@@ -135,5 +135,12 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProcessToken() {
+		return self::PROCESS_TOKEN;
 	}
 }
