@@ -32,7 +32,7 @@ use JBR\Advini\Interfaces\WrapperInterface;
 /**
  *
  */
-class AbstractWrapper implements WrapperInterface {
+abstract class AbstractWrapper implements WrapperInterface {
 
 	/**
 	 * @param string $methodName

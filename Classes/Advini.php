@@ -108,9 +108,10 @@ class Advini {
 			if ($instruction->canProcessValue($tokenValue)) {
 				throw new Exception(
 					sprintf(
-						'Cannot add instructor <%s> because already added instructor <%s> can process the token value',
-						$namespace,
-						get_class($instruction)
+						'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
+						get_class($instructor),
+						get_class($instruction),
+						$tokenValue
 					)
 				);
 			}
@@ -140,11 +141,13 @@ class Advini {
 	 * @throws Exception
 	 */
 	public function getInstructor($key) {
-		if (false === isset($this->instructions[$key])) {
-			throw new Exception(sprintf('Cannot find instructor <%s>!', $key));
+		$instructor = null;
+
+		if (true === isset($this->instructions[$key])) {
+			$instructor = $this->instructions[$key];
 		}
 
-		return $this->instructions[$key];
+		return $instructor;
 	}
 
 	/**
@@ -265,6 +268,10 @@ class Advini {
 					sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
 				);
 			}
+		} elseif (true === function_exists($methodName)) {
+			$result = $methodName($value);
+		} else {
+			throw new Exception(sprintf('Cannot found method <%s> for <%s>!', $methodName, $key));
 		}
 
 		return $result;
