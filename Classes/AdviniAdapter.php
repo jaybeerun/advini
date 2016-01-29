@@ -84,6 +84,10 @@ class AdviniAdapter {
 	 * @throws Exception
 	 */
 	protected function match($pattern, $value) {
+		if (0 < preg_match('/(\\(|\\)|\\$|\\"|\\=)/', $value, $invalidMatches)) {
+			throw new Exception(sprintf('Usage of an invalid pattern char <%s>', $invalidMatches[1]));
+		}
+
 		if (1 !== preg_match($pattern, $value, $matches)) {
 			throw new Exception(sprintf('Cannot parse instructor for <%s>', $value));
 		}
