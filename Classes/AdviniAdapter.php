@@ -84,12 +84,12 @@ class AdviniAdapter {
 	 * @throws Exception
 	 */
 	protected function match($pattern, $value) {
-		if (0 < preg_match('/(\\(|\\)|\\$|\\"|\\=)/', $value, $invalidMatches)) {
-			throw new Exception(sprintf('Usage of an invalid pattern char <%s>', $invalidMatches[1]));
+		if (0 < preg_match('/(\\\\(|\\\\)|\\\\$|"|=)/', $value, $invalidMatches)) {
+			throw new Exception(sprintf('Usage of an invalid pattern char: %s', $invalidMatches[1]));
 		}
 
 		if (1 !== preg_match($pattern, $value, $matches)) {
-			throw new Exception(sprintf('Cannot parse instructor for <%s>', $value));
+			throw new Exception(sprintf('Cannot parse instructor for: %s', $value));
 		}
 
 		return $matches;
@@ -103,7 +103,7 @@ class AdviniAdapter {
 	 * @return array
 	 */
 	public function matchNextValue($value, $token, $pattern) {
-		$pattern = sprintf('/%s%s/', $token, $pattern);
+		$pattern = sprintf('/%s%s/', $this->escapedTokenPattern($token), $pattern);
 
 		return $this->match($pattern, $value);
 	}
@@ -116,8 +116,26 @@ class AdviniAdapter {
 	 * @return array
 	 */
 	public function matchValue($value, $token, $pattern) {
-		$pattern = sprintf('/^%s%s$/', $token, $pattern);
+		$pattern = sprintf('/^%s%s$/', $this->escapedTokenPattern($token), $pattern);
 
 		return $this->match($pattern, $value);
+	}
+
+	/**
+	 * @param string $value
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	protected function escapedTokenPattern($value) {
+		if (0 < preg_match('/(\\(|\\)|\\$|"|=)/', $value, $invalidMatches)) {
+			throw new Exception(sprintf('Usage of an invalid token char: %s', $invalidMatches[1]));
+		}
+
+		return preg_replace(
+			'/(\\{|\\(|\\[|\\$|\\+|\\*|\\?|\\.|\\^|\\]|\\)|\\})/',
+			'\\$1',
+			$value
+		);
 	}
 }

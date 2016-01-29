@@ -1,13 +1,10 @@
 <?php
-use JBR\Advini\Advini;
-use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Instructor\ConstantInstructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
  * All rights reserved.
  *
- * Redistributionv and use in source and binary forms, with or without modification,
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions  of source code must retain the above copyright notice,  this
@@ -28,6 +25,14 @@ use JBR\Advini\Instructor\ConstantInstructor;
  * (INCLUDING  NEGLIGENCE OR OTHERWISE)  ARISING IN ANY WAY OUT OF THE USE OF  THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
+
+use JBR\Advini\Advini;
+use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Instructor\ConstantInstructor;
+
+/**
+ *
+ */
 class ConstantInstructorTest extends PHPUnit_Framework_TestCase{
 
 	const SERIALIZE_KEYS = 'a:2:{s:10:"all_things";s:5:"space";s:11:"are_awesome";s:3:"ace";}';
@@ -88,7 +93,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase{
 
 	/**
 	 * @expectedException Exception
-	 * @expectedExceptionMessage Cannot parse instructor for <<<this> is <<ugly>
+	 * @expectedExceptionMessage Cannot parse instructor for: <<this> is <<ugly>
 	 */
 	public function testIncompletedConstantInValueException() {
 		$advini = new Advini();
@@ -106,7 +111,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase{
 
 	/**
 	 * @expectedException Exception
-	 * @expectedExceptionMessage Cannot parse instructor for <<<this>_things>
+	 * @expectedExceptionMessage Cannot parse instructor for: <<this>_things
 	 */
 	public function testIncompletedConstantInKeyException() {
 		$advini = new Advini();
