@@ -32,60 +32,66 @@ use JBR\Advini\Interfaces\InstructorInterface;
 /**
  * Class InvalidInstructor
  */
-class InvalidInstructor implements InstructorInterface {
+class InvalidInstructor implements InstructorInterface
+{
 
-	const PROCESS_TOKEN = null;
+    const PROCESS_TOKEN = null;
 
-	const PROCESS_PATTERN = null;
+    const PROCESS_PATTERN = null;
 
-	/**
-	 * @return string
-	 */
-	public function getProcessToken() {
-		return static::PROCESS_TOKEN;
-	}
+    /**
+     * @return string
+     */
+    public function getProcessToken()
+    {
+        return static::PROCESS_TOKEN;
+    }
 
-	/**
-	 * @param mixed $key
-	 *
-	 * @return bool
-	 */
-	public function canProcessKey($key) {
-		return (true === is_array($key));
-	}
+    /**
+     * @param mixed $key
+     *
+     * @return bool
+     */
+    public function canProcessKey($key)
+    {
+        return (true === is_array($key));
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param array         $configuration
-	 *
-	 * @return void
-	 */
-	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		foreach ($configuration as $keyValue => &$value) {
-			while (FALSE !== strpos($keyValue, static::PROCESS_TOKEN)) {
-				$adapter->matchValue($keyValue, static::PROCESS_TOKEN, static::PROCESS_PATTERN);
-			}
-		}
-	}
+    /**
+     * @param AdviniAdapter $adapter
+     * @param array $configuration
+     *
+     * @return void
+     */
+    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    {
+        foreach ($configuration as $keyValue => &$value) {
+            while (false !== strpos($keyValue, static::PROCESS_TOKEN)) {
+                $adapter->matchValue($keyValue, static::PROCESS_TOKEN, static::PROCESS_PATTERN);
+            }
+        }
+    }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	public function canProcessValue($value) {
-		return ((true === is_string($value)) && (FALSE !== strpos($value, static::PROCESS_TOKEN)));
-	}
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function canProcessValue($value)
+    {
+        return ((true === is_string($value)) && (false !== strpos($value, static::PROCESS_TOKEN)));
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return void
-	 */
-	public function processValue(AdviniAdapter $adapter, &$value) {
-		while (FALSE !== strpos($value, static::PROCESS_TOKEN)) {
-			$adapter->matchValue($value, static::PROCESS_TOKEN, static::PROCESS_PATTERN);
-		}
-	}
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processValue(AdviniAdapter $adapter, &$value)
+    {
+        while (false !== strpos($value, static::PROCESS_TOKEN)) {
+            $adapter->matchValue($value, static::PROCESS_TOKEN, static::PROCESS_PATTERN);
+        }
+    }
 }

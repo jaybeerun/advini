@@ -31,137 +31,148 @@ use Exception;
 /**
  *
  */
-class Base extends AbstractWrapper {
+class Base extends AbstractWrapper
+{
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return string
-	 */
-	public function stringCommand($value) {
-		return (string) $value;
-	}
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function stringCommand($value)
+    {
+        return (string)$value;
+    }
 
-	public function arrayCommand($value) {
-		if ((false === is_array($value)) && (true === empty($value))) {
-			$value = [];
-		} else {
-			$value = [$value];
-		}
+    public function arrayCommand($value)
+    {
+        if ((false === is_array($value)) && (true === empty($value))) {
+            $value = [];
+        } else {
+            $value = [$value];
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function serializeCommand($value) {
-		$result = serialize($value);
-		if (false === $result) {
-			throw new Exception('Cannot serialize value!');
-		}
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function serializeCommand($value)
+    {
+        $result = serialize($value);
+        if (false === $result) {
+            throw new Exception('Cannot serialize value!');
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return string
-	 */
-	public function isIntegerCommand($value) {
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function isIntegerCommand($value)
+    {
 
-		return floatval($value);
-	}
+        return floatval($value);
+    }
 
-	/**
-	 * Checks a given mail address of availability.
-	 *
-	 * @param string $mail
-	 *
-	 * @return string
-	 */
-	public function checkMailCommand($mail) {
-		return $mail;
-	}
+    /**
+     * Checks a given mail address of availability.
+     *
+     * @param string $mail
+     *
+     * @return string
+     */
+    public function checkMailCommand($mail)
+    {
+        return $mail;
+    }
 
-	/**
-	 * Checks a given url of availability.
-	 *
-	 * @param string $url
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function checkUrlCommand($url) {
-		return $url;
-	}
+    /**
+     * Checks a given url of availability.
+     *
+     * @param string $url
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function checkUrlCommand($url)
+    {
+        return $url;
+    }
 
-	/**
-	 * Checks a given path of availability.
-	 *
-	 * @param string $path
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function checkDirCommand($path) {
-		if (FALSE === is_dir($path)) {
-			throw new Exception(sprintf('Path <%s> not found!', $path));
-		}
+    /**
+     * Checks a given path of availability.
+     *
+     * @param string $path
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function checkDirCommand($path)
+    {
+        if (false === is_dir($path)) {
+            throw new Exception(sprintf('Path <%s> not found!', $path));
+        }
 
-		return $path;
-	}
+        return $path;
+    }
 
-	/**
-	 * Checks a given file of availability.
-	 *
-	 * @param string $fileName
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function checkFileCommand($fileName) {
-		if (FALSE === is_file($fileName)) {
-			throw new Exception(sprintf('Cannot find file <%s>!', $fileName));
-		}
+    /**
+     * Checks a given file of availability.
+     *
+     * @param string $fileName
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function checkFileCommand($fileName)
+    {
+        if (false === is_file($fileName)) {
+            throw new Exception(sprintf('Cannot find file <%s>!', $fileName));
+        }
 
-		return $fileName;
-	}
+        return $fileName;
+    }
 
-	/**
-	 * Checks a given string of emptiness.
-	 *
-	 * @param string $value
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function notEmptyCommand($value) {
-		if (TRUE === empty($value)) {
-			throw new Exception('The value cannot be empty!');
-		}
+    /**
+     * Checks a given string of emptiness.
+     *
+     * @param string $value
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function notEmptyCommand($value)
+    {
+        if (true === empty($value)) {
+            throw new Exception('The value cannot be empty!');
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
 
-	/**
-	 * Checks a class name of availability.
-	 *
-	 * @param string $className
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function checkClassCommand($className) {
-		if (FALSE === class_exists($className)) {
-			throw new Exception(sprintf('Cannot found class <%s>!', $className));
-		}
+    /**
+     * Checks a class name of availability.
+     *
+     * @param string $className
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function checkClassCommand($className)
+    {
+        if (false === class_exists($className)) {
+            throw new Exception(sprintf('Cannot found class <%s>!', $className));
+        }
 
-		return $className;
-	}
+        return $className;
+    }
 }

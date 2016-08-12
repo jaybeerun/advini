@@ -37,135 +37,144 @@ use JBR\Advini\Traits\ArrayUtility;
  *
  *
  */
-class ConstantInstructor implements InstructorInterface {
+class ConstantInstructor implements InstructorInterface
+{
 
-	use ArrayUtility;
+    use ArrayUtility;
 
-	const PROCESS_TOKEN = '<<';
+    const PROCESS_TOKEN = '<<';
 
-	const TOKEN_DEFAULT_VALUE = ':';
+    const TOKEN_DEFAULT_VALUE = ':';
 
-	/**
-	 * @var array
-	 */
-	protected $constants = [];
+    /**
+     * @var array
+     */
+    protected $constants = [];
 
-	/**
-	 * @param mixed $key
-	 *
-	 * @return bool
-	 */
-	public function canProcessKey($key) {
-		return (true === is_array($key));
-	}
+    /**
+     * @param mixed $key
+     *
+     * @return bool
+     */
+    public function canProcessKey($key)
+    {
+        return (true === is_array($key));
+    }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	public function canProcessValue($value) {
-		return ((true === is_string($value)) && (FALSE !== strpos($value, self::PROCESS_TOKEN)));
-	}
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function canProcessValue($value)
+    {
+        return ((true === is_string($value)) && (false !== strpos($value, self::PROCESS_TOKEN)));
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param array         $configuration
-	 *
-	 * @return void
-	 */
-	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		$newConfiguration = [];
+    /**
+     * @param AdviniAdapter $adapter
+     * @param array $configuration
+     *
+     * @return void
+     */
+    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    {
+        $newConfiguration = [];
 
-		foreach ($configuration as $keyValue => &$value) {
-			while (FALSE !== strpos($keyValue, self::PROCESS_TOKEN)) {
-				// You cannot define these chars: $ { } ( )
-				$matches = $adapter->matchNextValue($keyValue, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
-				$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
-				$key = $parts[0];
+        foreach ($configuration as $keyValue => &$value) {
+            while (false !== strpos($keyValue, self::PROCESS_TOKEN)) {
+                // You cannot define these chars: $ { } ( )
+                $matches = $adapter->matchNextValue($keyValue, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
+                $parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
+                $key = $parts[0];
 
-				if (true === isset($this->constants[$key])) {
-					$keyValue = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $keyValue);
-				} elseif (true === isset($parts[1])) {
-					$keyValue = str_replace($matches[0], $this->convert($adapter, $parts[1]), $keyValue);
-				} else {
-					$keyValue = $matches[1];
-				}
-			}
+                if (true === isset($this->constants[$key])) {
+                    $keyValue = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $keyValue);
+                } elseif (true === isset($parts[1])) {
+                    $keyValue = str_replace($matches[0], $this->convert($adapter, $parts[1]), $keyValue);
+                } else {
+                    $keyValue = $matches[1];
+                }
+            }
 
-			$newConfiguration[$keyValue] = $value;
-		}
+            $newConfiguration[$keyValue] = $value;
+        }
 
-		$configuration = $newConfiguration;
-	}
+        $configuration = $newConfiguration;
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return string
-	 */
-	protected function convert(AdviniAdapter $adapter, $value) {
-		if (null !== ($statement = $adapter->getInstructor(CharsetInstructor::class))) {
-			/** @var ConvertInterface $statement */
-			$value = $statement->convert($adapter, $value);
-		}
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function convert(AdviniAdapter $adapter, $value)
+    {
+        if (null !== ($statement = $adapter->getInstructor(CharsetInstructor::class))) {
+            /** @var ConvertInterface $statement */
+            $value = $statement->convert($adapter, $value);
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string $value
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	public function processValue(AdviniAdapter $adapter, &$value) {
-		while (FALSE !== strpos($value, self::PROCESS_TOKEN)) {
-			// You cannot define these chars: $ { } ( )
-			$matches = $adapter->matchNextValue($value, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
-			$parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
-			$key = $parts[0];
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @throws Exception
+     * @return void
+     */
+    public function processValue(AdviniAdapter $adapter, &$value)
+    {
+        while (false !== strpos($value, self::PROCESS_TOKEN)) {
+            // You cannot define these chars: $ { } ( )
+            $matches = $adapter->matchNextValue($value, self::PROCESS_TOKEN, '( *[^<>]+ *)>>');
+            $parts = explode(self::TOKEN_DEFAULT_VALUE, trim($matches[1]), 2);
+            $key = $parts[0];
 
-			if (true === isset($this->constants[$key])) {
-				$value = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $value);
-			} elseif (true === isset($parts[1])) {
-				$value = str_replace($matches[0], $this->convert($adapter, $parts[1]), $value);
+            if (true === isset($this->constants[$key])) {
+                $value = str_replace($matches[0], $this->convert($adapter, $this->constants[$key]), $value);
+            } elseif (true === isset($parts[1])) {
+                $value = str_replace($matches[0], $this->convert($adapter, $parts[1]), $value);
 
-				if (null === $value) {
-					$value = '';
-				}
-			} else {
-				throw new Exception(sprintf('Cannot found constant <%s>', $key));
-			}
-		}
-	}
+                if (null === $value) {
+                    $value = '';
+                }
+            } else {
+                throw new Exception(sprintf('Cannot found constant <%s>', $key));
+            }
+        }
+    }
 
-	/**
-	 * @param string $file
-	 *
-	 * @return void
-	 */
-	public function setConstantsFromFile($file) {
-		$constants = parse_ini_file($file, true);
-		$this->extractKeys($constants, Advini::TOKEN_MULTI_KEY_SEPARATOR);
-		$this->constants = array_merge($this->constants, $constants);
-	}
+    /**
+     * @param string $file
+     *
+     * @return void
+     */
+    public function setConstantsFromFile($file)
+    {
+        $constants = parse_ini_file($file, true);
+        $this->extractKeys($constants, Advini::TOKEN_MULTI_KEY_SEPARATOR);
+        $this->constants = array_merge($this->constants, $constants);
+    }
 
-	/**
- 	 * @param array $constants
- 	 *
- 	 * @return void
- 	 */
-	public function setConstants(array $constants) {
-		$this->constants = array_merge($this->constants, $constants);
-	}
+    /**
+     * @param array $constants
+     *
+     * @return void
+     */
+    public function setConstants(array $constants)
+    {
+        $this->constants = array_merge($this->constants, $constants);
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getProcessToken() {
-		return self::PROCESS_TOKEN;
-	}
+    /**
+     * @return string
+     */
+    public function getProcessToken()
+    {
+        return self::PROCESS_TOKEN;
+    }
 }

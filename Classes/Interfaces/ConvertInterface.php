@@ -32,13 +32,14 @@ use JBR\Advini\AdviniAdapter;
  *
  *
  */
-interface ConvertInterface {
+interface ConvertInterface
+{
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return string
-	 */
-	public function convert(AdviniAdapter $adapter, $value);
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return string
+     */
+    public function convert(AdviniAdapter $adapter, $value);
 }

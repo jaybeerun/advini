@@ -32,27 +32,29 @@ use JBR\Advini\Interfaces\WrapperInterface;
 /**
  *
  */
-abstract class AbstractWrapper implements WrapperInterface {
+abstract class AbstractWrapper implements WrapperInterface
+{
 
-	/**
-	 * @param string $methodName
-	 * @param mixed  $value
-	 *
-	 * @return mixed
-	 * @throws Exception
-	 */
-	final public function execute($methodName, $value) {
-		$result = null;
-		$classMethod = sprintf('%sCommand', $methodName);
+    /**
+     * @param string $methodName
+     * @param mixed $value
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    final public function execute($methodName, $value)
+    {
+        $result = null;
+        $classMethod = sprintf('%sCommand', $methodName);
 
-		if (true === is_callable([$this, $classMethod])) {
-			$result = $this->{$classMethod}($value);
-		} elseif (true === is_callable($methodName)) {
-			$result = $methodName($value);
-		} else {
-			throw new Exception(sprintf('Cannot find method <%s>!', $methodName));
-		}
+        if (true === is_callable([$this, $classMethod])) {
+            $result = $this->{$classMethod}($value);
+        } elseif (true === is_callable($methodName)) {
+            $result = $methodName($value);
+        } else {
+            throw new Exception(sprintf('Cannot find method <%s>!', $methodName));
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 }

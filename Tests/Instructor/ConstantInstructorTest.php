@@ -33,101 +33,106 @@ use JBR\Advini\Instructor\ConstantInstructor;
 /**
  *
  */
-class ConstantInstructorTest extends PHPUnit_Framework_TestCase{
+class ConstantInstructorTest extends PHPUnit_Framework_TestCase
+{
 
-	const SERIALIZE_KEYS = 'a:2:{s:10:"all_things";s:5:"space";s:11:"are_awesome";s:3:"ace";}';
+    const SERIALIZE_KEYS = 'a:2:{s:10:"all_things";s:5:"space";s:11:"are_awesome";s:3:"ace";}';
 
-	/**
-	 *
-	 */
-	public function testProcessValues() {
-		$const = new ConstantInstructor();
-		$const->setConstants([
-			'this' => 'all',
-			'ugly' => 'awesome'
-		]);
+    /**
+     *
+     */
+    public function testProcessValues()
+    {
+        $const = new ConstantInstructor();
+        $const->setConstants([
+            'this' => 'all',
+            'ugly' => 'awesome'
+        ]);
 
-		$value = '<this>> is <ugly>>';
-		$this->assertEquals(false, $const->canProcessValue($value));
+        $value = '<this>> is <ugly>>';
+        $this->assertEquals(false, $const->canProcessValue($value));
 
-		$value = '<<this>> is <<ugly>>';
-		$this->assertEquals(true, $const->canProcessValue($value));
+        $value = '<<this>> is <<ugly>>';
+        $this->assertEquals(true, $const->canProcessValue($value));
 
-		$advini = new Advini();
-		$adapter = new AdviniAdapter($advini);
+        $advini = new Advini();
+        $adapter = new AdviniAdapter($advini);
 
-		$const->processValue($adapter, $value);
-		$this->assertEquals('all is awesome', $value);
-	}
+        $const->processValue($adapter, $value);
+        $this->assertEquals('all is awesome', $value);
+    }
 
-	/**
-	 *
-	 */
-	public function testProcessKey() {
-		$const = new ConstantInstructor();
-		$const->setConstants([
-			'this' => 'all',
-			'ugly' => 'awesome'
-		]);
+    /**
+     *
+     */
+    public function testProcessKey()
+    {
+        $const = new ConstantInstructor();
+        $const->setConstants([
+            'this' => 'all',
+            'ugly' => 'awesome'
+        ]);
 
-		$keys = [
-			'<this>>_things' => 'space',
-			'are_<ugly>>' => 'ace'
-		];
-		// yes, its true because its simply an array
-		$this->assertEquals(true, $const->canProcessKey($keys));
+        $keys = [
+            '<this>>_things' => 'space',
+            'are_<ugly>>' => 'ace'
+        ];
+        // yes, its true because its simply an array
+        $this->assertEquals(true, $const->canProcessKey($keys));
 
-		$keys = [
-			'<<this>>_things' => 'space',
-			'are_<<ugly>>' => 'ace'
-		];
-		$this->assertEquals(true, $const->canProcessKey($keys));
+        $keys = [
+            '<<this>>_things' => 'space',
+            'are_<<ugly>>' => 'ace'
+        ];
+        $this->assertEquals(true, $const->canProcessKey($keys));
 
-		$advini = new Advini();
-		$adapter = new AdviniAdapter($advini);
+        $advini = new Advini();
+        $adapter = new AdviniAdapter($advini);
 
-		$const->processKey($adapter, $keys);
-		$hash = serialize($keys);
-		$this->assertEquals($hash, self::SERIALIZE_KEYS);
-	}
+        $const->processKey($adapter, $keys);
+        $hash = serialize($keys);
+        $this->assertEquals($hash, self::SERIALIZE_KEYS);
+    }
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Cannot parse instructor for: <<this> is <<ugly>
-	 */
-	public function testIncompletedConstantInValueException() {
-		$advini = new Advini();
-		$adapter = new AdviniAdapter($advini);
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Cannot parse instructor for: <<this> is <<ugly>
+     */
+    public function testIncompletedConstantInValueException()
+    {
+        $advini = new Advini();
+        $adapter = new AdviniAdapter($advini);
 
-		$const = new ConstantInstructor();
-		$const->setConstants([
-			'this' => 'all',
-			'ugly' => 'awesome'
-		]);
+        $const = new ConstantInstructor();
+        $const->setConstants([
+            'this' => 'all',
+            'ugly' => 'awesome'
+        ]);
 
-		$value = '<<this> is <<ugly>';
-		$const->processValue($adapter, $value);
-	}
+        $value = '<<this> is <<ugly>';
+        $const->processValue($adapter, $value);
+    }
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Cannot parse instructor for: <<this>_things
-	 */
-	public function testIncompletedConstantInKeyException() {
-		$advini = new Advini();
-		$adapter = new AdviniAdapter($advini);
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Cannot parse instructor for: <<this>_things
+     */
+    public function testIncompletedConstantInKeyException()
+    {
+        $advini = new Advini();
+        $adapter = new AdviniAdapter($advini);
 
-		$const = new ConstantInstructor();
-		$const->setConstants([
-			'this' => 'all',
-			'ugly' => 'awesome'
-		]);
+        $const = new ConstantInstructor();
+        $const->setConstants([
+            'this' => 'all',
+            'ugly' => 'awesome'
+        ]);
 
-		$keys = [
-			'<<this>_things' => 'space',
-			'are_<<ugly>' => 'ace'
-		];
+        $keys = [
+            '<<this>_things' => 'space',
+            'are_<<ugly>' => 'ace'
+        ];
 
-		$const->processKey($adapter, $keys);
-	}
+        $const->processKey($adapter, $keys);
+    }
 }

@@ -35,245 +35,259 @@ use JBR\Advini\Wrapper\AbstractWrapper;
 /**
  *
  */
-class Advini {
+class Advini
+{
 
-	use ArrayUtility, FileUtility;
+    use ArrayUtility, FileUtility;
 
-	const TOKEN_METHOD_SEPARATOR = ':';
+    const TOKEN_METHOD_SEPARATOR = ':';
 
-	const TOKEN_MULTI_KEY_SEPARATOR = '/';
+    const TOKEN_MULTI_KEY_SEPARATOR = '/';
 
-	/**
-	 * @var AbstractWrapper
-	 */
-	protected $wrapper;
+    /**
+     * @var AbstractWrapper
+     */
+    protected $wrapper;
 
-	/**
-	 * @var array
-	 */
-	protected $instructions = [];
+    /**
+     * @var array
+     */
+    protected $instructions = [];
 
-	/**
-	 * @var AdviniAdapter
-	 */
-	protected $adapter;
+    /**
+     * @var AdviniAdapter
+     */
+    protected $adapter;
 
-	/**
-	 * @var boolean
-	 */
-	protected $disableExtractKeys = false;
+    /**
+     * @var boolean
+     */
+    protected $disableExtractKeys = false;
 
-	/**
-	 * Advini constructor.
-	 *
-	 * @param AbstractWrapper $methodsObject
-	 */
-	public function __construct(AbstractWrapper $methodsObject = null) {
-		$this->wrapper = $methodsObject;
-	}
+    /**
+     * Advini constructor.
+     *
+     * @param AbstractWrapper $methodsObject
+     */
+    public function __construct(AbstractWrapper $methodsObject = null)
+    {
+        $this->wrapper = $methodsObject;
+    }
 
-	/**
-	 * @return void
-	 */
-	public function disableExtractKeys() {
-		$this->disableExtractKeys = true;
-	}
+    /**
+     * @return void
+     */
+    public function disableExtractKeys()
+    {
+        $this->disableExtractKeys = true;
+    }
 
-	/**
-	 * @return void
-	 */
-	public function enableExtractKeys() {
-		$this->disableExtractKeys = false;
-	}
+    /**
+     * @return void
+     */
+    public function enableExtractKeys()
+    {
+        $this->disableExtractKeys = false;
+    }
 
-	/**
-	 * @param InstructorInterface $instructor
-	 * @param string              $namespace
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	public function addInstructor(InstructorInterface $instructor, $namespace = null) {
-		if (null === $namespace) {
-			$namespace = get_class($instructor);
-		}
+    /**
+     * @param InstructorInterface $instructor
+     * @param string $namespace
+     *
+     * @throws Exception
+     * @return void
+     */
+    public function addInstructor(InstructorInterface $instructor, $namespace = null)
+    {
+        if (null === $namespace) {
+            $namespace = get_class($instructor);
+        }
 
-		if (false === class_exists($namespace)) {
-			throw new Exception(sprintf('Cannot find class <%s> with dependency injection for instructor!', $namespace));
-		}
+        if (false === class_exists($namespace)) {
+            throw new Exception(sprintf('Cannot find class <%s> with dependency injection for instructor!',
+                $namespace));
+        }
 
-		$tokenValue = $instructor->getProcessToken();
+        $tokenValue = $instructor->getProcessToken();
 
-		foreach ($this->instructions as $instruction /** @var InstructorInterface $instruction */) {
-			if ($instruction->canProcessValue($tokenValue)) {
-				throw new Exception(
-					sprintf(
-						'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
-						get_class($instructor),
-						get_class($instruction),
-						$tokenValue
-					)
-				);
-			}
-		}
+        foreach ($this->instructions as $instruction/** @var InstructorInterface $instruction */) {
+            if ($instruction->canProcessValue($tokenValue)) {
+                throw new Exception(
+                    sprintf(
+                        'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
+                        get_class($instructor),
+                        get_class($instruction),
+                        $tokenValue
+                    )
+                );
+            }
+        }
 
-		if (true === isset($this->instructions[$namespace])) {
-			$this->instructions[$namespace] = null;
-			unset($this->instructions[$namespace]);
-		}
+        if (true === isset($this->instructions[$namespace])) {
+            $this->instructions[$namespace] = null;
+            unset($this->instructions[$namespace]);
+        }
 
-		$this->instructions[$namespace] = $instructor;
-	}
+        $this->instructions[$namespace] = $instructor;
+    }
 
-	/**
-	 * @param string $key
-	 *
-	 * @return boolean
-	 */
-	public function hasInstructor($key) {
-		return (true === isset($this->instructions[$key]));
-	}
+    /**
+     * @param string $key
+     *
+     * @return boolean
+     */
+    public function hasInstructor($key)
+    {
+        return (true === isset($this->instructions[$key]));
+    }
 
-	/**
-	 * @param string $key
-	 *
-	 * @return InstructorInterface
-	 * @throws Exception
-	 */
-	public function getInstructor($key) {
-		$instructor = null;
+    /**
+     * @param string $key
+     *
+     * @return InstructorInterface
+     * @throws Exception
+     */
+    public function getInstructor($key)
+    {
+        $instructor = null;
 
-		if (true === isset($this->instructions[$key])) {
-			$instructor = $this->instructions[$key];
-		}
+        if (true === isset($this->instructions[$key])) {
+            $instructor = $this->instructions[$key];
+        }
 
-		return $instructor;
-	}
+        return $instructor;
+    }
 
-	/**
-	 * @param string $file
-	 * @param bool   $finalize
-	 *
-	 * @return array
-	 */
-	public function getFromFile($file, $finalize = false) {
-		$this->assertFile($file);
-		$this->setCwd(dirname($file));
+    /**
+     * @param string $file
+     * @param bool $finalize
+     *
+     * @return array
+     */
+    public function getFromFile($file, $finalize = false)
+    {
+        $this->assertFile($file);
+        $this->setCwd(dirname($file));
 
-		$this->adapter = new AdviniAdapter($this);
+        $this->adapter = new AdviniAdapter($this);
 
-		$configuration = $this->getArrayFromIniFile($file);
+        $configuration = $this->getArrayFromIniFile($file);
 
-		$this->processKeyInstructions($configuration);
+        $this->processKeyInstructions($configuration);
 
-		if (false === $this->disableExtractKeys) {
-			$this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
-		}
+        if (false === $this->disableExtractKeys) {
+            $this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
+        }
 
-		$this->processConfiguration($configuration, $finalize);
+        $this->processConfiguration($configuration, $finalize);
 
-		return $configuration;
-	}
+        return $configuration;
+    }
 
-	/**
-	 * @param mixed   $configuration
-	 * @param boolean $finalize
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	public function processConfiguration(&$configuration, $finalize = false) {
-		if (true === is_array($configuration)) {
-			$this->throughConfiguration($configuration, $finalize);
-		} elseif (true === is_string($configuration)) {
-			$this->processValueStatements($configuration);
-		}
-	}
+    /**
+     * @param array $configuration
+     *
+     * @return void
+     */
+    protected function processKeyInstructions(array &$configuration)
+    {
+        foreach ($this->instructions as $instructor/** @var InstructorInterface $instructor */) {
+            if (true === $instructor->canProcessKey($configuration)) {
+                $instructor->processKey(new AdviniAdapter($this), $configuration);
+            }
+        }
+    }
 
-	/**
-	 * @param array $configuration
-	 *
-	 * @return void
-	 */
-	protected function processKeyInstructions(array &$configuration) {
-		foreach ($this->instructions as $instructor /** @var InstructorInterface $instructor */) {
-			if (true === $instructor->canProcessKey($configuration)) {
-				$instructor->processKey(new AdviniAdapter($this), $configuration);
-			}
-		}
-	}
+    /**
+     * @param mixed $configuration
+     * @param boolean $finalize
+     *
+     * @throws Exception
+     * @return void
+     */
+    public function processConfiguration(&$configuration, $finalize = false)
+    {
+        if (true === is_array($configuration)) {
+            $this->throughConfiguration($configuration, $finalize);
+        } elseif (true === is_string($configuration)) {
+            $this->processValueStatements($configuration);
+        }
+    }
 
-	/**
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	protected function processValueStatements(&$value) {
-		foreach ($this->instructions as $instructor /** @var InstructorInterface $instructor */) {
-			if (true === $instructor->canProcessValue($value)) {
-				$instructor->processValue(new AdviniAdapter($this), $value);
-			}
-		}
-	}
+    /**
+     * @param array $configuration
+     * @param boolean $finalize
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function throughConfiguration(array &$configuration, $finalize = false)
+    {
+        $this->processKeyInstructions($configuration);
 
-	/**
-	 * @param array   $configuration
-	 * @param boolean $finalize
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	protected function throughConfiguration(array &$configuration, $finalize = false) {
-		$this->processKeyInstructions($configuration);
+        foreach ($configuration as $originKey => $value) {
+            $methods = explode(self::TOKEN_METHOD_SEPARATOR, $originKey);
 
-		foreach ($configuration as $originKey => $value) {
-			$methods = explode(self::TOKEN_METHOD_SEPARATOR, $originKey);
+            if ((true === $finalize) && (1 < count($methods))) {
+                $toSetKey = array_shift($methods);
 
-			if ((true === $finalize) && (1 < count($methods))) {
-				$toSetKey = array_shift($methods);
+                foreach ($methods as $method) {
+                    $value = $this->processMethod($method, $originKey, $value, $finalize);
+                }
 
-				foreach ($methods as $method) {
-					$value = $this->processMethod($method, $originKey, $value, $finalize);
-				}
+                $configuration[$toSetKey] = $value;
 
-				$configuration[$toSetKey] = $value;
+                unset($configuration[$originKey]);
+            } else {
+                $this->processConfiguration($value, true);
+                $configuration[$originKey] = $value;
+            }
+        }
+    }
 
-				unset($configuration[$originKey]);
-			} else {
-				$this->processConfiguration($value, true);
-				$configuration[$originKey] = $value;
-			}
-		}
-	}
+    /**
+     * @param string $methodName
+     * @param string $key
+     * @param array $value
+     * @param boolean $finalize
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    protected function processMethod($methodName, $key, $value, $finalize = false)
+    {
+        $result = null;
 
-	/**
-	 * @param string  $methodName
-	 * @param string  $key
-	 * @param array   $value
-	 * @param boolean $finalize
-	 *
-	 * @return mixed
-	 * @throws Exception
-	 */
-	protected function processMethod($methodName, $key, $value, $finalize = false) {
-		$result = null;
+        $this->processConfiguration($value, $finalize);
 
-		$this->processConfiguration($value, $finalize);
+        if (null !== $this->wrapper) {
+            try {
+                $result = $this->wrapper->execute($methodName, $value);
+            } catch (Exception $e) {
+                throw new Exception(
+                    sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
+                );
+            }
+        } elseif (true === function_exists($methodName)) {
+            $result = $methodName($value);
+        } else {
+            throw new Exception(sprintf('Cannot found method <%s> for <%s>!', $methodName, $key));
+        }
 
-		if (null !== $this->wrapper) {
-			try {
-				$result = $this->wrapper->execute($methodName, $value);
-			} catch (Exception $e) {
-				throw new Exception(
-					sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
-				);
-			}
-		} elseif (true === function_exists($methodName)) {
-			$result = $methodName($value);
-		} else {
-			throw new Exception(sprintf('Cannot found method <%s> for <%s>!', $methodName, $key));
-		}
+        return $result;
+    }
 
-		return $result;
-	}
+    /**
+     * @param string $value
+     *
+     * @return void
+     */
+    protected function processValueStatements(&$value)
+    {
+        foreach ($this->instructions as $instructor/** @var InstructorInterface $instructor */) {
+            if (true === $instructor->canProcessValue($value)) {
+                $instructor->processValue(new AdviniAdapter($this), $value);
+            }
+        }
+    }
 }

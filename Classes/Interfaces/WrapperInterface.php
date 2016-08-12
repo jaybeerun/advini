@@ -30,13 +30,14 @@
  *
  *
  */
-interface WrapperInterface {
+interface WrapperInterface
+{
 
-	/**
-	 * @param string $methodName
-	 * @param mixed  $value
-	 *
-	 * @return mixed
-	 */
-	public function execute($methodName, $value);
+    /**
+     * @param string $methodName
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function execute($methodName, $value);
 }

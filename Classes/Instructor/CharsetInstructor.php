@@ -35,112 +35,121 @@ use JBR\Advini\Interfaces\InstructorInterface;
  *
  *
  */
-class CharsetInstructor implements InstructorInterface, ConvertInterface {
+class CharsetInstructor implements InstructorInterface, ConvertInterface
+{
 
-	const PROCESS_TOKEN = '@charset';
+    const PROCESS_TOKEN = '@charset';
 
-	/**
-	 * @var string
-	 */
-	protected $fromEncoding = null;
+    /**
+     * @var string
+     */
+    protected $fromEncoding = null;
 
-	/**
-	 * @var string
-	 */
-	protected $toEncoding = null;
+    /**
+     * @var string
+     */
+    protected $toEncoding = null;
 
-	/**
-	 * @param string $charset
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	protected function setEncoding($charset) {
-		$charsets = array_flip(mb_list_encodings());
+    /**
+     * @param mixed $key
+     *
+     * @return bool
+     */
+    public function canProcessKey($key)
+    {
+        return (true === is_array($key));
+    }
 
-		if (false === isset($charsets[$charset])) {
-			throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
-		}
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function canProcessValue($value)
+    {
+        return false;
+    }
 
-		return $charset;
-	}
+    /**
+     * @param AdviniAdapter $adapter
+     * @param array $configuration
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    {
+        if (true === isset($configuration[self::PROCESS_TOKEN])) {
+            $this->fromEncoding = $this->setEncoding($configuration[self::PROCESS_TOKEN]);
 
-	/**
-	 * @return string
-	 */
-	public function getEncoding() {
-		return $this->toEncoding;
-	}
+            if (null === $this->getEncoding()) {
+                throw new Exception(
+                    sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
+                );
+            }
 
-	/**
-	 * @param mixed $key
-	 *
-	 * @return bool
-	 */
-	public function canProcessKey($key) {
-		return (true === is_array($key));
-	}
+            unset($configuration[self::PROCESS_TOKEN]);
+        }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	public function canProcessValue($value) {
-		return false;
-	}
+        return null;
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param array         $configuration
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function processKey(AdviniAdapter $adapter, array &$configuration) {
-		if (true === isset($configuration[self::PROCESS_TOKEN])) {
-			$this->fromEncoding = $this->setEncoding($configuration[self::PROCESS_TOKEN]);
+    /**
+     * @param string $charset
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function setEncoding($charset)
+    {
+        $charsets = array_flip(mb_list_encodings());
 
-			if (null === $this->getEncoding()) {
-				throw new Exception(
-					sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
-				);
-			}
+        if (false === isset($charsets[$charset])) {
+            throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
+        }
 
-			unset($configuration[self::PROCESS_TOKEN]);
-		}
+        return $charset;
+    }
 
-		return null;
-	}
+    /**
+     * @return string
+     */
+    public function getEncoding()
+    {
+        return $this->toEncoding;
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return void
-	 */
-	public function processValue(AdviniAdapter $adapter, &$value) {
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processValue(AdviniAdapter $adapter, &$value)
+    {
 
-	}
+    }
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string        $value
-	 *
-	 * @return string
-	 */
-	public function convert(AdviniAdapter $adapter, $value) {
-		if (null !== $this->fromEncoding) {
-			$value = mb_convert_encoding($value, $this->getEncoding(), $this->fromEncoding);
-		}
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return string
+     */
+    public function convert(AdviniAdapter $adapter, $value)
+    {
+        if (null !== $this->fromEncoding) {
+            $value = mb_convert_encoding($value, $this->getEncoding(), $this->fromEncoding);
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getProcessToken() {
-		return self::PROCESS_TOKEN;
-	}
+    /**
+     * @return string
+     */
+    public function getProcessToken()
+    {
+        return self::PROCESS_TOKEN;
+    }
 }

@@ -8,9 +8,9 @@
          syntaxCheck="false"
          bootstrap="vendor/autoload.php"
 >
-  <testsuites>
-    <testsuite name="Advini Test Suite">
-      <directory>./Tests</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Advini Test Suite">
+            <directory>./Tests</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>

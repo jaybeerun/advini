@@ -29,10 +29,11 @@
 /**
  * Class InvalidInstructorForPattern
  */
-class InvalidInstructorForPattern extends InvalidInstructor {
+class InvalidInstructorForPattern extends InvalidInstructor
+{
 
-	const PROCESS_TOKEN = '@invalid ';
+    const PROCESS_TOKEN = '@invalid ';
 
-	const PROCESS_PATTERN = '"( *[^"]+ *)"';
+    const PROCESS_PATTERN = '"( *[^"]+ *)"';
 
 }

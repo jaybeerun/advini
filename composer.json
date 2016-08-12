@@ -1,13 +1,21 @@
 {
   "name": "nimayneb/advini",
   "description": "Advanced INI reader",
-  "keywords": [ "advanced", "initialize", "reader", "multi", "array", "extract", "expand", "configuration", "settings"],
+  "keywords": [
+    "advanced",
+    "initialize",
+    "reader",
+    "multi",
+    "array",
+    "extract",
+    "expand",
+    "configuration",
+    "settings"
+  ],
   "homepage": "https://github.com/nimayneb/advini",
   "license": "BSD-3-Clause",
   "version": "1.5.1",
-  
   "minimum-stability": "dev",
-
   "authors": [
     {
       "name": "Jan Runte",
@@ -15,16 +23,13 @@
       "role": "Developer"
     }
   ],
-
   "require": {
     "php": ">5.4.10",
     "ext-mbstring": "*"
   },
-
   "require-dev": {
     "phpunit/phpunit": "4.8.*"
   },
-
   "autoload": {
     "psr-4": {
       "JBR\\Advini\\": "Classes/"

@@ -28,69 +28,75 @@ use Exception;
 /**
  *
  */
-trait FileUtility {
+trait FileUtility
+{
 
-	/**
-	 * Current working directory
-	 *
-	 * @var string
-	 */
-	private $cwd = null;
+    /**
+     * Current working directory
+     *
+     * @var string
+     */
+    private $cwd = null;
 
-	/**
-	 * @param $path
-	 *
-	 * @return void
-	 */
-	public function setCwd($path) {
-		$this->assertPath($path);
-		$this->cwd = $path;
-	}
+    /**
+     * @return string
+     */
+    public function getCwd()
+    {
+        return $this->cwd;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCwd() {
-		return $this->cwd;
-	}
+    /**
+     * @param $path
+     *
+     * @return void
+     */
+    public function setCwd($path)
+    {
+        $this->assertPath($path);
+        $this->cwd = $path;
+    }
 
-	/**
-	 * @param string $pathName
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	protected function assertPath($pathName) {
-		if (false === is_dir($pathName)) {
-			throw new Exception(sprintf('Cannot find path <%s>.', $pathName));
-		}
-	}
+    /**
+     * @param string $pathName
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function assertPath($pathName)
+    {
+        if (false === is_dir($pathName)) {
+            throw new Exception(sprintf('Cannot find path <%s>.', $pathName));
+        }
+    }
 
-	/**
-	 * @param string $fileName
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	protected function assertFile($fileName) {
-		if (false === is_file($fileName)) {
-			throw new Exception(sprintf('Cannot find file <%s>.', $fileName));
-		}
-	}
+    /**
+     * @param string $fileName
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function assertFile($fileName)
+    {
+        if (false === is_file($fileName)) {
+            throw new Exception(sprintf('Cannot find file <%s>.', $fileName));
+        }
+    }
 
-	/**
-	 * @param string $file
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	protected function getArrayFromIniFile($file) {
-		$configuration = parse_ini_file($file, true);
+    /**
+     * @param string $file
+     *
+     * @return array
+     * @throws Exception
+     */
+    protected function getArrayFromIniFile($file)
+    {
+        $configuration = parse_ini_file($file, true);
 
-		if (false === $configuration) {
-			throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
-		}
+        if (false === $configuration) {
+            throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
+        }
 
-		return $configuration;
-	}
+        return $configuration;
+    }
 }

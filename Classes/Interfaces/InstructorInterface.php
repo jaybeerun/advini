@@ -32,40 +32,41 @@ use JBR\Advini\AdviniAdapter;
  *
  *
  */
-interface InstructorInterface {
+interface InstructorInterface
+{
 
-	/**
-	 * @return string
-	 */
-	public function getProcessToken();
+    /**
+     * @return string
+     */
+    public function getProcessToken();
 
-	/**
-	 * @param mixed $key
-	 *
-	 * @return bool
-	 */
-	public function canProcessKey($key);
+    /**
+     * @param mixed $key
+     *
+     * @return bool
+     */
+    public function canProcessKey($key);
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param array         $configuration
-	 *
-	 * @return void
-	 */
-	public function processKey(AdviniAdapter $adapter, array &$configuration);
+    /**
+     * @param AdviniAdapter $adapter
+     * @param array $configuration
+     *
+     * @return void
+     */
+    public function processKey(AdviniAdapter $adapter, array &$configuration);
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	public function canProcessValue($value);
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function canProcessValue($value);
 
-	/**
-	 * @param AdviniAdapter $adapter
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	public function processValue(AdviniAdapter $adapter, &$value);
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processValue(AdviniAdapter $adapter, &$value);
 }

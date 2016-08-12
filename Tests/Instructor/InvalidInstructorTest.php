@@ -36,33 +36,36 @@ require_once('InvalidInstructorForPattern.php');
 /**
  *
  */
-class InvalidInstructorTest extends PHPUnit_Framework_TestCase {
+class InvalidInstructorTest extends PHPUnit_Framework_TestCase
+{
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Usage of an invalid token char: (
-	 */
-	public function testInvalidConstructorForToken() {
-		$instructor = new InvalidInstructorForToken();
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Usage of an invalid token char: (
+     */
+    public function testInvalidConstructorForToken()
+    {
+        $instructor = new InvalidInstructorForToken();
 
-		$ini = new Advini();
-		$adapter = new AdviniAdapter($ini);
+        $ini = new Advini();
+        $adapter = new AdviniAdapter($ini);
 
-		$value = '@invalid (value1)';
-		$instructor->processValue($adapter, $value);
-	}
+        $value = '@invalid (value1)';
+        $instructor->processValue($adapter, $value);
+    }
 
-	/**
-	 * @expectedException Exception
-	 * @expectedExceptionMessage Usage of an invalid pattern char: "
-	 */
-	public function testInvalidConstructorForPattern() {
-		$instructor = new InvalidInstructorForPattern();
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Usage of an invalid pattern char: "
+     */
+    public function testInvalidConstructorForPattern()
+    {
+        $instructor = new InvalidInstructorForPattern();
 
-		$ini = new Advini();
-		$adapter = new AdviniAdapter($ini);
+        $ini = new Advini();
+        $adapter = new AdviniAdapter($ini);
 
-		$value = '@invalid "value2"';
-		$instructor->processValue($adapter, $value);
-	}
+        $value = '@invalid "value2"';
+        $instructor->processValue($adapter, $value);
+    }
 }

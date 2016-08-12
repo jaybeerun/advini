@@ -29,37 +29,39 @@
 /**
  *
  */
-trait ArrayUtility {
+trait ArrayUtility
+{
 
-	/**
-	 * Extract multi named keys like "key1/key2".
-	 *
-	 * @param array $source
-	 * @param       $separator
-	 *
-	 * @return void
-	 */
-	protected function extractKeys(array &$source, $separator) {
-		foreach ($source as $key => &$value) {
-			if (true === is_array($value)) {
-				$this->extractKeys($value, $separator);
-			}
+    /**
+     * Extract multi named keys like "key1/key2".
+     *
+     * @param array $source
+     * @param       $separator
+     *
+     * @return void
+     */
+    protected function extractKeys(array &$source, $separator)
+    {
+        foreach ($source as $key => &$value) {
+            if (true === is_array($value)) {
+                $this->extractKeys($value, $separator);
+            }
 
-			if (false !== strpos($key, $separator)) {
-				$key_arr = explode($separator, $key);
-				$last_key = array_pop($key_arr);
-				$cur_elem = &$source;
+            if (false !== strpos($key, $separator)) {
+                $key_arr = explode($separator, $key);
+                $last_key = array_pop($key_arr);
+                $cur_elem = &$source;
 
-				foreach ($key_arr as $key_step) {
-					if (false === isset($cur_elem[$key_step])) {
-						$cur_elem[$key_step] = [];
-					}
-					$cur_elem = &$cur_elem[$key_step];
-				}
+                foreach ($key_arr as $key_step) {
+                    if (false === isset($cur_elem[$key_step])) {
+                        $cur_elem[$key_step] = [];
+                    }
+                    $cur_elem = &$cur_elem[$key_step];
+                }
 
-				$cur_elem[$last_key] = $value;
-				unset($source[$key]);
-			}
-		}
-	}
+                $cur_elem[$last_key] = $value;
+                unset($source[$key]);
+            }
+        }
+    }
 }
