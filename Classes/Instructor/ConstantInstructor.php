@@ -26,6 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use Exception;
 use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
 use JBR\Advini\Interfaces\ConvertInterface;
@@ -115,8 +116,9 @@ class ConstantInstructor implements InstructorInterface {
 
 	/**
 	 * @param AdviniAdapter $adapter
-	 * @param string        $value
+	 * @param string $value
 	 *
+	 * @throws Exception
 	 * @return void
 	 */
 	public function processValue(AdviniAdapter $adapter, &$value) {
@@ -134,6 +136,8 @@ class ConstantInstructor implements InstructorInterface {
 				if (null === $value) {
 					$value = '';
 				}
+			} else {
+				throw new Exception(sprintf('Cannot found constant <%s>', $key));
 			}
 		}
 	}
