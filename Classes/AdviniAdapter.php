@@ -123,7 +123,7 @@ class AdviniAdapter
      */
     protected function match($pattern, $value)
     {
-        if (0 < preg_match('/(\\(|\\)|\\$|"|=)/', $value, $invalidMatches)) {
+        if (0 < preg_match('/(\\\\[(]|\\\\[)]|\\\\[$]|"|=)/', $value, $invalidMatches)) {
             throw new Exception(sprintf('Usage of an invalid pattern char: %s', $invalidMatches[1]));
         }
 
