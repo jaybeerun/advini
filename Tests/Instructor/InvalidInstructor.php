@@ -34,7 +34,6 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class InvalidInstructor implements InstructorInterface
 {
-
     const PROCESS_TOKEN = null;
 
     const PROCESS_PATTERN = null;

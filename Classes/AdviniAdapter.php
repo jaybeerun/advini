@@ -74,7 +74,7 @@ class AdviniAdapter
     /**
      * @param string $file
      *
-     * @return Advini
+     * @return array
      */
     public function getFromFile($file)
     {
@@ -103,10 +103,6 @@ class AdviniAdapter
      */
     protected function escapedTokenPattern($value)
     {
-        if (0 < preg_match('/(\\(|\\)|\\$|"|=)/', $value, $invalidMatches)) {
-            throw new Exception(sprintf('Usage of an invalid token char: %s', $invalidMatches[1]));
-        }
-
         return preg_replace(
             '/(\\{|\\(|\\[|\\$|\\+|\\*|\\?|\\.|\\^|\\]|\\)|\\})/',
             '\\$1',
@@ -123,10 +119,6 @@ class AdviniAdapter
      */
     protected function match($pattern, $value)
     {
-        if (0 < preg_match('/(\\\\[(]|\\\\[)]|\\\\[$]|"|=)/', $value, $invalidMatches)) {
-            throw new Exception(sprintf('Usage of an invalid pattern char: %s', $invalidMatches[1]));
-        }
-
         if (1 !== preg_match($pattern, $value, $matches)) {
             throw new Exception(sprintf('Cannot parse instructor for: %s', $value));
         }
