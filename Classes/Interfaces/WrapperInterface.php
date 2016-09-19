@@ -32,7 +32,6 @@
  */
 interface WrapperInterface
 {
-
     /**
      * @param string $methodName
      * @param mixed $value

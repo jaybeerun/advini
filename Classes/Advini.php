@@ -37,7 +37,6 @@ use JBR\Advini\Wrapper\AbstractWrapper;
  */
 class Advini
 {
-
     use ArrayUtility, FileUtility;
 
     const TOKEN_METHOD_SEPARATOR = ':';

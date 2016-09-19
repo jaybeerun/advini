@@ -35,7 +35,6 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class ImportInstructor implements InstructorInterface
 {
-
     const PROCESS_TOKEN = '@import';
 
     /**
@@ -55,8 +54,10 @@ class ImportInstructor implements InstructorInterface
      */
     public function canProcessValue($value)
     {
-        return ((true === is_string($value)) && (self::PROCESS_TOKEN === substr($value, 0,
-                    strlen(self::PROCESS_TOKEN))));
+        return (
+            (true === is_string($value))
+            && (self::PROCESS_TOKEN === substr($value, 0, strlen(self::PROCESS_TOKEN)))
+        );
     }
 
     /**
@@ -67,7 +68,7 @@ class ImportInstructor implements InstructorInterface
      */
     public function processValue(AdviniAdapter $adapter, &$value)
     {
-        $matches = $adapter->matchValue($value, self::PROCESS_TOKEN, '\\[( *[^[]]+ *)\\]');
+        $matches = $adapter->matchValue($value, self::PROCESS_TOKEN, '\\[( *[^\\[\\]]+ *)\\]');
         $value = $this->importFromFile($adapter, trim($matches[1]));
     }
 

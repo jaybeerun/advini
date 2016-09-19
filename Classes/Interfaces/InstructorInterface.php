@@ -34,7 +34,6 @@ use JBR\Advini\AdviniAdapter;
  */
 interface InstructorInterface
 {
-
     /**
      * @return string
      */

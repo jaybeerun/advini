@@ -37,7 +37,6 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class CharsetInstructor implements InstructorInterface, ConvertInterface
 {
-
     const PROCESS_TOKEN = '@charset';
 
     /**

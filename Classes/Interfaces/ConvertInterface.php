@@ -34,7 +34,6 @@ use JBR\Advini\AdviniAdapter;
  */
 interface ConvertInterface
 {
-
     /**
      * @param AdviniAdapter $adapter
      * @param string $value

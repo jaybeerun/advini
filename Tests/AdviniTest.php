@@ -29,8 +29,6 @@
 use JBR\Advini\Advini;
 use JBR\Advini\Instructor\ConstantInstructor;
 use JBR\Advini\Instructor\ImportInstructor;
-use JBR\Advini\Statements\ConstantStatement;
-use JBR\Advini\Statements\ImportStatement;
 use JBR\Advini\Wrapper\Base;
 
 /**

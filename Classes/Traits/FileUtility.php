@@ -30,7 +30,6 @@ use Exception;
  */
 trait FileUtility
 {
-
     /**
      * Current working directory
      *

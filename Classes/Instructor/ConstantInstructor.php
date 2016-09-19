@@ -39,7 +39,6 @@ use JBR\Advini\Traits\ArrayUtility;
  */
 class ConstantInstructor implements InstructorInterface
 {
-
     use ArrayUtility;
 
     const PROCESS_TOKEN = '<<';

@@ -33,7 +33,6 @@ use Exception;
  */
 class Base extends AbstractWrapper
 {
-
     /**
      * @param mixed $value
      *

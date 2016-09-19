@@ -31,7 +31,6 @@
  */
 trait ArrayUtility
 {
-
     /**
      * Extract multi named keys like "key1/key2".
      *

@@ -34,7 +34,6 @@ use JBR\Advini\Interfaces\InstructorInterface;
  */
 class AdviniAdapter
 {
-
     /**
      * @var Advini
      */

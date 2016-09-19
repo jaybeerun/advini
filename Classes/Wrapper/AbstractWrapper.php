@@ -34,7 +34,6 @@ use JBR\Advini\Interfaces\WrapperInterface;
  */
 abstract class AbstractWrapper implements WrapperInterface
 {
-
     /**
      * @param string $methodName
      * @param mixed $value
