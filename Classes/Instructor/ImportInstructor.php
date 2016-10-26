@@ -94,10 +94,9 @@ class ImportInstructor implements InstructorInterface
     public function processKey(AdviniAdapter $adapter, array &$configuration)
     {
         if (true === isset($configuration[self::PROCESS_TOKEN])) {
-            $additionalConfiguration = $this->importFromFile($adapter, $configuration[self::PROCESS_TOKEN]);
-            $configuration = array_merge($configuration, $additionalConfiguration);
-
+            $basedOnConfiguration = $this->importFromFile($adapter, $configuration[self::PROCESS_TOKEN]);
             unset($configuration[self::PROCESS_TOKEN]);
+            $configuration = array_merge($basedOnConfiguration, $configuration);
         }
 
         return null;

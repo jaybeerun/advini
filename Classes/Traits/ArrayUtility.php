@@ -35,7 +35,7 @@ trait ArrayUtility
      * Extract multi named keys like "key1/key2".
      *
      * @param array $source
-     * @param       $separator
+     * @param string $separator
      *
      * @return void
      */

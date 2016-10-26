@@ -77,6 +77,18 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     /**
      *
      */
+    public function testSimpleFileWithBasedOnImport()
+    {
+        $iniFile = new Advini();
+        $iniFile->addInstructor(new ImportInstructor());
+
+        $configuration = $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/simpleBasedOnImport.ini');
+        $this->assertEquals($this->result, serialize($configuration));
+    }
+
+    /**
+     *
+     */
     public function testSimpleImportFileWithConstants()
     {
         $iniFile = new Advini();

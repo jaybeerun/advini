@@ -172,12 +172,11 @@ class Advini
 
         $configuration = $this->getArrayFromIniFile($file);
 
-        $this->processKeyInstructions($configuration);
-
         if (false === $this->disableExtractKeys) {
             $this->extractKeys($configuration, self::TOKEN_MULTI_KEY_SEPARATOR);
         }
 
+        $this->processKeyInstructions($configuration);
         $this->processConfiguration($configuration, $finalize);
 
         return $configuration;
