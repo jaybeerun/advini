@@ -43,6 +43,27 @@ class Base extends AbstractWrapper
         return (string)$value;
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function jsonCommand($value)
+    {
+        $json = json_decode($value);
+
+        if (NULL === $json) {
+            throw new Exception('Cannot decode json content!');
+        }
+
+        return json_encode($json);
+    }
+
+    /**
+     * @param $value
+     * @return array
+     */
     public function arrayCommand($value)
     {
         if ((false === is_array($value)) && (true === empty($value))) {
