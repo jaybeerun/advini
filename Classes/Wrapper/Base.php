@@ -49,6 +49,17 @@ class Base extends AbstractWrapper
      * @return string
      * @throws Exception
      */
+    public function octalCommand($value)
+    {
+        return intval(base_convert($value, 8, 10));
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     * @throws Exception
+     */
     public function jsonCommand($value)
     {
         $json = json_decode($value);
