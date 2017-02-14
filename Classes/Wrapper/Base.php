@@ -49,9 +49,9 @@ class Base extends AbstractWrapper
      * @return string
      * @throws Exception
      */
-    public function octalCommand($value)
+    public function octdecCommand($value)
     {
-        return intval(base_convert($value, 8, 10));
+        return octdec($value);
     }
 
     /**
