@@ -44,6 +44,26 @@ class Base extends AbstractWrapper
     }
 
     /**
+     * @param array $value
+     *
+     * @return string
+     */
+    public function linesSeparatedCommand(array $value)
+    {
+        return implode("\n",$value);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return string
+     */
+    public function commaSeparatedCommand(array $value)
+    {
+        return implode(',',$value);
+    }
+
+    /**
      * @param mixed $value
      *
      * @return string
@@ -79,6 +99,14 @@ class Base extends AbstractWrapper
     {
         if ((false === is_array($value)) && (true === empty($value))) {
             $value = [];
+        } elseif (true === is_string($value)) {
+            if (1 < strpos($value, ',')) {
+                $value = explode(',', $value);
+            } elseif (1 < strpos($value, "\n")) {
+                $value = explode("\n", $value);
+            } else {
+                $value = [$value];
+            }
         } else {
             $value = [$value];
         }
@@ -95,6 +123,7 @@ class Base extends AbstractWrapper
     public function serializeCommand($value)
     {
         $result = serialize($value);
+
         if (false === $result) {
             throw new Exception('Cannot serialize value!');
         }
@@ -109,7 +138,6 @@ class Base extends AbstractWrapper
      */
     public function isIntegerCommand($value)
     {
-
         return floatval($value);
     }
 
