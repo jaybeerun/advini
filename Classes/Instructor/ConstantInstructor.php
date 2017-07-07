@@ -51,6 +51,19 @@ class ConstantInstructor implements InstructorInterface
     protected $constants = [];
 
     /**
+     * @var bool
+     */
+    protected $automaticallyAddConstants = false;
+
+    /**
+     * @param bool $automaticallyAddConstants
+     */
+    public function __construct($automaticallyAddConstants = false)
+    {
+        $this->automaticallyAddConstants = $automaticallyAddConstants;
+    }
+
+    /**
      * @param mixed $key
      *
      * @return bool
@@ -68,6 +81,28 @@ class ConstantInstructor implements InstructorInterface
     public function canProcessValue($value)
     {
         return ((true === is_string($value)) && (false !== strpos($value, self::PROCESS_TOKEN)));
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function canProcessKeyValue($key, $value)
+    {
+        return ((true === $this->automaticallyAddConstants) && (true === is_string($value)));
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processKeyValue($key, $value)
+    {
+        $this->setConstant($key, $value);
     }
 
     /**
@@ -157,6 +192,17 @@ class ConstantInstructor implements InstructorInterface
         $constants = parse_ini_file($file, true);
         $this->extractKeys($constants, Advini::TOKEN_MULTI_KEY_SEPARATOR);
         $this->constants = array_merge($this->constants, $constants);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return void
+     */
+    public function setConstant($key, $value)
+    {
+        $this->constants[$key] = $value;
     }
 
     /**

@@ -47,18 +47,18 @@ trait ArrayUtility
             }
 
             if (false !== strpos($key, $separator)) {
-                $key_arr = explode($separator, $key);
-                $last_key = array_pop($key_arr);
-                $cur_elem = &$source;
+                $keyArr = explode($separator, $key);
+                $lastKey = array_pop($keyArr);
+                $currentElement = &$source;
 
-                foreach ($key_arr as $key_step) {
-                    if (false === isset($cur_elem[$key_step])) {
-                        $cur_elem[$key_step] = [];
+                foreach ($keyArr as $key_step) {
+                    if (false === isset($currentElement[$key_step])) {
+                        $currentElement[$key_step] = [];
                     }
-                    $cur_elem = &$cur_elem[$key_step];
+                    $currentElement = &$currentElement[$key_step];
                 }
 
-                $cur_elem[$last_key] = $value;
+                $currentElement[$lastKey] = $value;
                 unset($source[$key]);
             }
         }

@@ -68,4 +68,20 @@ interface InstructorInterface
      * @return void
      */
     public function processValue(AdviniAdapter $adapter, &$value);
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function canProcessKeyValue($key, $value);
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processKeyValue($key, $value);
 }

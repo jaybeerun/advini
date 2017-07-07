@@ -49,7 +49,7 @@ class Advini
     protected $wrapper;
 
     /**
-     * @var array
+     * @var InstructorInterface[]
      */
     protected $instructions = [];
 
@@ -239,6 +239,12 @@ class Advini
             } else {
                 $this->processConfiguration($value, true);
                 $configuration[$originKey] = $value;
+
+                foreach ($this->instructions as $instructor) {
+                    if (true === $instructor->canProcessKeyValue($originKey, $value)) {
+                        $instructor->processKeyValue($originKey, $value);
+                    }
+                }
             }
         }
     }

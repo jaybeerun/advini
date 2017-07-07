@@ -151,4 +151,26 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
     {
         return self::PROCESS_TOKEN;
     }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function canProcessKeyValue($key, $value)
+    {
+        return false;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processKeyValue($key, $value)
+    {
+
+    }
 }
