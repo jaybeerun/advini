@@ -30,7 +30,7 @@ use JBR\Advini\AdviniAdapter;
 use JBR\Advini\Interfaces\Instructor;
 
 /**
- * Class InvalidInstructor
+ *
  */
 class InvalidInstructor implements Instructor
 {
@@ -41,7 +41,7 @@ class InvalidInstructor implements Instructor
     /**
      * @return string
      */
-    public function getProcessToken()
+    public function getProcessToken(): string
     {
         return static::PROCESS_TOKEN;
     }
@@ -51,7 +51,7 @@ class InvalidInstructor implements Instructor
      *
      * @return bool
      */
-    public function canProcessKey($key)
+    public function canProcessKey(mixed $key): bool
     {
         return (true === is_array($key));
     }
@@ -62,7 +62,7 @@ class InvalidInstructor implements Instructor
      *
      * @return void
      */
-    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    public function processKey(AdviniAdapter $adapter, array &$configuration): void
     {
         foreach ($configuration as $keyValue => &$value) {
             while (false !== strpos($keyValue, static::PROCESS_TOKEN)) {
@@ -72,11 +72,11 @@ class InvalidInstructor implements Instructor
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      *
      * @return bool
      */
-    public function canProcessValue($value)
+    public function canProcessValue(string $value): bool
     {
         return ((true === is_string($value)) && (false !== strpos($value, static::PROCESS_TOKEN)));
     }
@@ -87,10 +87,32 @@ class InvalidInstructor implements Instructor
      *
      * @return void
      */
-    public function processValue(AdviniAdapter $adapter, &$value)
+    public function processValue(AdviniAdapter $adapter, string &$value): void
     {
         while (false !== strpos($value, static::PROCESS_TOKEN)) {
             $adapter->matchValue($value, static::PROCESS_TOKEN, static::PROCESS_PATTERN);
         }
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function canProcessKeyValue(string $key, string $value): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    public function processKeyValue(string $key, string $value): void
+    {
+        (false);
     }
 }

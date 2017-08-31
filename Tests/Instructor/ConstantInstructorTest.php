@@ -39,9 +39,9 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
     const SERIALIZE_KEYS = 'a:2:{s:10:"all_things";s:5:"space";s:11:"are_awesome";s:3:"ace";}';
 
     /**
-     *
+     * @test
      */
-    public function testProcessValues()
+    public function processValues(): void
     {
         $const = new Constant();
         $const->setConstants([
@@ -63,9 +63,9 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testProcessKey()
+    public function processKey(): void
     {
         $const = new Constant();
         $const->setConstants([
@@ -95,10 +95,11 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\InvalidValue
      * @expectedExceptionMessage Cannot parse instructor for: <<this> is <<ugly>
      */
-    public function testIncompletedConstantInValueException()
+    public function incompletedConstantInValueException(): void
     {
         $advini = new Advini();
         $adapter = new AdviniAdapter($advini);
@@ -114,10 +115,11 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\InvalidValue
      * @expectedExceptionMessage Cannot parse instructor for: <<this>_things
      */
-    public function testIncompletedConstantInKeyException()
+    public function incompletedConstantInKeyException(): void
     {
         $advini = new Advini();
         $adapter = new AdviniAdapter($advini);

@@ -53,9 +53,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     protected $resultWithKeyConstant = 'a:1:{s:8:"category";a:1:{s:16:"subcategory_temp";a:1:{s:4:"key1";a:1:{s:4:"key2";s:5:"value";}}}}';
 
     /**
-     *
+     * @test
      */
-    public function testSimpleFile()
+    public function simpleFile(): void
     {
         $iniFile = new Advini();
         $configuration = $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/simple.ini');
@@ -63,9 +63,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleFileWithImport()
+    public function simpleFileWithImport(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -75,9 +75,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleFileWithBasedOnImport()
+    public function simpleFileWithBasedOnImport(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -87,9 +87,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleImportFileWithConstants()
+    public function simpleImportFileWithConstants(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -104,9 +104,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleFileWithConstants()
+    public function simpleFileWithConstants(): void
     {
         $iniFile = new Advini();
 
@@ -120,9 +120,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleFileWithConstantsAndMethods()
+    public function simpleFileWithConstantsAndMethods(): void
     {
         $iniFile = new Advini(new DefaultCommands());
 
@@ -136,9 +136,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleImportFileWithConstantsAndMethods()
+    public function simpleImportFileWithConstantsAndMethods(): void
     {
         $iniFile = new Advini(new DefaultCommands());
         $iniFile->addInstructor(new Import());
@@ -153,9 +153,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleImportAsKeyFileWithConstantsAndMethods()
+    public function simpleImportAsKeyFileWithConstantsAndMethods(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -165,9 +165,9 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @test
      */
-    public function testSimpleImportAsKeyFileWithConstantsAndMethodsAndDynamicKey()
+    public function simpleImportAsKeyFileWithConstantsAndMethodsAndDynamicKey(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -182,20 +182,22 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\MissingReference
      * @expectedExceptionMessageRegExp /^Cannot find class <NotValid>/
      */
-    public function testInvalidInstructorException()
+    public function invalidInstructorException(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import(), 'NotValid');
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\InvalidValue
      * @expectedExceptionMessageRegExp /can process the token value <@import>$/
      */
-    public function testCollisionInstructorException()
+    public function collisionInstructorException(): void
     {
         $iniFile = new Advini();
         $iniFile->addInstructor(new Import());
@@ -203,20 +205,22 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\MissingReference
      * @expectedExceptionMessageRegExp /^Cannot found method <not_exists>/
      */
-    public function testNotFoundMethodsException()
+    public function notFoundMethodsException(): void
     {
         $iniFile = new Advini();
         $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/failedSimple.ini');
     }
 
     /**
-     * @expectedException Exception
+     * @test
+     * @expectedException \JBR\Advini\Exceptions\MissingReference
      * @expectedExceptionMessageRegExp /Cannot find method <not_exists>!$/
      */
-    public function testNotFoundMethodsForWrapperException()
+    public function notFoundMethodsForWrapperException(): void
     {
         $iniFile = new Advini(new DefaultCommands());
         $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/failedSimple.ini');
