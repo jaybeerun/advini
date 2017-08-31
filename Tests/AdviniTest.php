@@ -30,11 +30,12 @@ use JBR\Advini\Advini;
 use JBR\Advini\Instructor\Constant;
 use JBR\Advini\Instructor\Import;
 use JBR\Advini\Setter\DefaultCommands;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Class AdviniTest
+ *
  */
-class AdviniTest extends PHPUnit_Framework_TestCase
+class AdviniTest extends TestCase
 {
 
     /**

@@ -29,11 +29,12 @@
 use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
 use JBR\Advini\Instructor\Constant;
+use PHPUnit\Framework\TestCase;
 
 /**
  *
  */
-class ConstantInstructorTest extends PHPUnit_Framework_TestCase
+class ConstantInstructorTest extends TestCase
 {
 
     const SERIALIZE_KEYS = 'a:2:{s:10:"all_things";s:5:"space";s:11:"are_awesome";s:3:"ace";}';
