@@ -41,7 +41,7 @@ class DefaultCommands extends Conversion
      */
     public function stringCommand(mixed $value): string
     {
-        return (string) $value;
+        return (string)$value;
     }
 
     /**
