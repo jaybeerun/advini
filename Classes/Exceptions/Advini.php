@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Exceptions;
+<?php declare(strict_types=1); namespace JBR\Advini\Exceptions;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -24,7 +24,7 @@ class Advini extends Exception
      * @param string $message
      * @param mixed[] ...$arguments
      */
-    public function __construct($message = '', mixed ...$arguments)
+    public function __construct(string $message = '', ...$arguments)
     {
         parent::__construct(vsprintf($message, $arguments));
     }

@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Setter;
+<?php declare(strict_types=1); namespace JBR\Advini\Setter;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -39,7 +39,7 @@ class DefaultCommands extends Conversion
      *
      * @return string
      */
-    public function stringCommand(mixed $value): string
+    public function stringCommand($value): string
     {
         return (string)$value;
     }
@@ -49,7 +49,7 @@ class DefaultCommands extends Conversion
      *
      * @return string
      */
-    public function linesSeparatedCommand(array $value): string
+    public function lineSeparatedCommand(array $value): string
     {
         return implode("\n", $value);
     }
@@ -67,9 +67,9 @@ class DefaultCommands extends Conversion
     /**
      * @param mixed $value
      *
-     * @return string
+     * @return number
      */
-    public function octdecCommand(mixed $value): string
+    public function octdecCommand($value): number
     {
         return octdec($value);
     }
@@ -80,7 +80,7 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws InvalidValue
      */
-    public function jsonCommand(mixed $value): string
+    public function jsonCommand($value): string
     {
         $json = json_decode($value);
 
@@ -93,9 +93,10 @@ class DefaultCommands extends Conversion
 
     /**
      * @param mixed $value
+     *
      * @return array
      */
-    public function arrayCommand(mixed $value): array
+    public function arrayCommand($value): array
     {
         if ((false === is_array($value)) && (true === empty($value))) {
             $value = [];
@@ -120,7 +121,7 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws InvalidValue
      */
-    public function serializeCommand(mixed $value): string
+    public function serializeCommand($value): string
     {
         $result = serialize($value);
 
@@ -134,11 +135,35 @@ class DefaultCommands extends Conversion
     /**
      * @param mixed $value
      *
-     * @return string
+     * @return float
+     * @throws InvalidValue
      */
-    public function isIntegerCommand(mixed $value): string
+    public function isFloatCommand($value): float
     {
-        return floatval($value);
+        $result = floatval($value);
+
+        if ((string) $value === (string) $result) {
+            throw new InvalidValue('Not a float value: %s', $value);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int
+     * @throws InvalidValue
+     */
+    public function isIntegerCommand($value): int
+    {
+        $result = intval($value);
+
+        if ((string) $value === (string) $result) {
+            throw new InvalidValue('Not a integer value: %s', $value);
+        }
+
+        return $result;
     }
 
     /**
@@ -148,7 +173,7 @@ class DefaultCommands extends Conversion
      *
      * @return string
      */
-    public function checkMailCommand(mixed $mail): string
+    public function checkMailCommand($mail): string
     {
         return $mail;
     }
@@ -159,9 +184,16 @@ class DefaultCommands extends Conversion
      * @param string $url
      *
      * @return string
+     * @throws InvalidValue
      */
     public function checkUrlCommand(string $url): string
     {
+        $result = parse_url($url);
+
+        if (false === $result) {
+            throw new InvalidValue('Not a URL value: %s', $url);
+        }
+
         return $url;
     }
 
@@ -173,7 +205,7 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws MissingReference
      */
-    public function checkDirCommand(mixed $path): string
+    public function checkDirCommand($path): string
     {
         if (false === is_dir($path)) {
             throw new MissingReference('Path <%s> not found!', $path);
@@ -190,7 +222,7 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws MissingReference
      */
-    public function checkFileCommand(mixed $fileName): string
+    public function checkFileCommand($fileName): string
     {
         if (false === is_file($fileName)) {
             throw new MissingReference('Cannot find file <%s>!', $fileName);
@@ -207,7 +239,7 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws InvalidValue
      */
-    public function notEmptyCommand(mixed $value): string
+    public function notEmptyCommand($value): string
     {
         if (true === empty($value)) {
             throw new InvalidValue('The value cannot be empty!');
@@ -225,10 +257,10 @@ class DefaultCommands extends Conversion
      * @return string
      * @throws MissingReference
      */
-    public function checkClassCommand(mixed $className): string
+    public function checkClassCommand($className): string
     {
         if (false === class_exists($className)) {
-            throw new MissingReference('Cannot found class <%s>!', $className);
+            throw new MissingReference('Cannot find class <%s>!', $className);
         }
 
         return $className;

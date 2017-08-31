@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Instructor;
+<?php declare(strict_types=1); namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,9 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
 use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Exceptions\MissingReference;
 use JBR\Advini\Interfaces\Converter;
 use JBR\Advini\Interfaces\Instructor;
 use JBR\Advini\Traits\ArrayUtility;
@@ -68,28 +68,28 @@ class Constant implements Instructor
      *
      * @return bool
      */
-    public function canProcessKey(mixed $key): bool
+    public function canProcessKey($key): bool
     {
         return (true === is_array($key));
     }
 
     /**
-     * @param string $value
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessValue(string $value): bool
+    public function canProcessValue($value): bool
     {
         return ((true === is_string($value)) && (false !== strpos($value, self::PROCESS_TOKEN)));
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param int|string|array|float $key
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessKeyValue(string $key, string $value): bool
+    public function canProcessKeyValue($key, $value): bool
     {
         return ((true === $this->automaticallyAddConstants) && (true === is_string($value)));
     }
@@ -111,7 +111,7 @@ class Constant implements Instructor
      *
      * @return void
      */
-    public function setConstant(string $key, mixed $value): void
+    public function setConstant(string $key, $value): void
     {
         $this->constants[$key] = $value;
     }
@@ -168,7 +168,7 @@ class Constant implements Instructor
      * @param AdviniAdapter $adapter
      * @param string $value
      *
-     * @throws Exception
+     * @throws MissingReference
      * @return void
      */
     public function processValue(AdviniAdapter $adapter, string &$value): void
@@ -188,7 +188,7 @@ class Constant implements Instructor
                     $value = '';
                 }
             } else {
-                throw new Exception(sprintf('Cannot found constant <%s>', $key));
+                throw new MissingReference('Cannot find constant <%s>', $key);
             }
         }
     }

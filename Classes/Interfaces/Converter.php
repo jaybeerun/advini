@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php declare(strict_types=1); namespace JBR\Advini\Interfaces;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte

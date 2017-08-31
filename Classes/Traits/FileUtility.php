@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Traits;
+<?php declare(strict_types=1); namespace JBR\Advini\Traits;
 
 /**********************************************************************
  *  Copyright notice

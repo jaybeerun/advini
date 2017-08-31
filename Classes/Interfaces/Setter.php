@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php declare(strict_types=1); namespace JBR\Advini\Interfaces;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -34,9 +34,9 @@ interface Setter
 {
     /**
      * @param string $methodName
-     * @param mixed $value
+     * @param callable|string $value
      *
      * @return mixed
      */
-    public function execute(string $methodName, mixed $value):mixed;
+    public function execute(string $methodName, $value);
 }

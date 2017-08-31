@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Instructor;
+<?php declare(strict_types=1); namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,8 +26,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
 use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Exceptions\InvalidValue;
 use JBR\Advini\Interfaces\Converter;
 use JBR\Advini\Interfaces\Instructor;
 
@@ -54,17 +54,17 @@ class Charset implements Instructor, Converter
      *
      * @return bool
      */
-    public function canProcessKey(mixed $key): bool
+    public function canProcessKey($key): bool
     {
         return (true === is_array($key));
     }
 
     /**
-     * @param string $value
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessValue(string $value): bool
+    public function canProcessValue($value): bool
     {
         return false;
     }
@@ -74,7 +74,7 @@ class Charset implements Instructor, Converter
      * @param array $configuration
      *
      * @return void
-     * @throws Exception
+     * @throws InvalidValue
      */
     public function processKey(AdviniAdapter $adapter, array &$configuration): void
     {
@@ -82,9 +82,7 @@ class Charset implements Instructor, Converter
             $this->fromEncoding = $this->setEncoding($configuration[self::PROCESS_TOKEN]);
 
             if (null === $this->getEncoding()) {
-                throw new Exception(
-                    sprintf('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding)
-                );
+                throw new InvalidValue('Cannot convert from <%s> encoding without knowing where to convert!', $this->fromEncoding);
             }
 
             unset($configuration[self::PROCESS_TOKEN]);
@@ -97,14 +95,14 @@ class Charset implements Instructor, Converter
      * @param string $charset
      *
      * @return string
-     * @throws Exception
+     * @throws InvalidValue
      */
     protected function setEncoding(string $charset): string
     {
         $charsets = array_flip(mb_list_encodings());
 
         if (false === isset($charsets[$charset])) {
-            throw new Exception(sprintf('Invalid or unknown charset <%s>!', $charset));
+            throw new InvalidValue('Invalid or unknown charset <%s>!', $charset);
         }
 
         return $charset;
@@ -153,12 +151,12 @@ class Charset implements Instructor, Converter
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param int|string|array|float $key
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessKeyValue(string $key, string $value): bool
+    public function canProcessKeyValue($key, $value): bool
     {
         return false;
     }

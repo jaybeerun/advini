@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini;
+<?php declare(strict_types=1); namespace JBR\Advini;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,7 +26,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
 use JBR\Advini\Exceptions\InvalidValue;
 use JBR\Advini\Interfaces\Instructor;
 
@@ -50,9 +49,10 @@ class AdviniAdapter
 
     /**
      * @param string $key
+     *
      * @return Instructor
      */
-    public function getInstructor(string $key): Instructor
+    public function getInstructor(string $key): ?Instructor
     {
         $instructor = null;
 
@@ -100,7 +100,7 @@ class AdviniAdapter
      *
      * @return mixed
      */
-    protected function escapedTokenPattern(string $value): mixed
+    protected function escapedTokenPattern(string $value)
     {
         return preg_replace(
             '/(\\{|\\(|\\[|\\$|\\+|\\*|\\?|\\.|\\^|\\]|\\)|\\})/',
@@ -114,7 +114,7 @@ class AdviniAdapter
      * @param string $value
      *
      * @return array
-     * @throws Exception
+     * @throws InvalidValue
      */
     protected function match(string $pattern, string $value): array
     {

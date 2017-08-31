@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -208,7 +208,7 @@ class AdviniTest extends TestCase
     /**
      * @test
      * @expectedException \JBR\Advini\Exceptions\MissingReference
-     * @expectedExceptionMessageRegExp /^Cannot found method <not_exists>/
+     * @expectedExceptionMessageRegExp /^Cannot find method <not_exists>/
      */
     public function notFoundMethodsException(): void
     {
@@ -218,8 +218,8 @@ class AdviniTest extends TestCase
 
     /**
      * @test
-     * @expectedException \JBR\Advini\Exceptions\MissingReference
-     * @expectedExceptionMessageRegExp /Cannot find method <not_exists>!$/
+     * @expectedException \JBR\Advini\Exceptions\InvalidValue
+     * @expectedExceptionMessageRegExp /^Invalid configuration settings for <key2:not_exists>/
      */
     public function notFoundMethodsForWrapperException(): void
     {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -72,11 +72,11 @@ class InvalidInstructor implements Instructor
     }
 
     /**
-     * @param string $value
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessValue(string $value): bool
+    public function canProcessValue($value): bool
     {
         return ((true === is_string($value)) && (false !== strpos($value, static::PROCESS_TOKEN)));
     }
@@ -95,12 +95,12 @@ class InvalidInstructor implements Instructor
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param int|string|array|float $key
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessKeyValue(string $key, string $value): bool
+    public function canProcessKeyValue($key, $value): bool
     {
         return false;
     }

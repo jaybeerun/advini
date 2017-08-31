@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Instructor;
+<?php declare(strict_types=1); namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -42,17 +42,17 @@ class Import implements Instructor
      *
      * @return bool
      */
-    public function canProcessKey(mixed $key): bool
+    public function canProcessKey($key): bool
     {
         return (true === is_array($key));
     }
 
     /**
-     * @param mixed $value
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessValue(string $value): bool
+    public function canProcessValue($value): bool
     {
         return (
             (true === is_string($value))
@@ -109,12 +109,12 @@ class Import implements Instructor
     }
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param int|string|array|float $key
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessKeyValue(string $key, string $value): bool
+    public function canProcessKeyValue($key, $value): bool
     {
         return false;
     }

@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini;
+<?php declare(strict_types=1); namespace JBR\Advini;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -110,7 +110,7 @@ class Advini
 
         $tokenValue = $instructor->getProcessToken();
 
-        foreach ($this->instructions as $instruction/** @var Instructor $instruction */) {
+        foreach ($this->instructions as $instruction) {
             if ($instruction->canProcessValue($tokenValue)) {
                 throw new InvalidValue(
                     'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
@@ -143,7 +143,6 @@ class Advini
      * @param string $key
      *
      * @return Instructor
-     * @throws Exception
      */
     public function getInstructor(string $key): Instructor
     {
@@ -188,7 +187,7 @@ class Advini
      */
     protected function processKeyInstructions(array &$configuration): void
     {
-        foreach ($this->instructions as $instructor/** @var Instructor $instructor */) {
+        foreach ($this->instructions as $instructor) {
             if (true === $instructor->canProcessKey($configuration)) {
                 $instructor->processKey(new AdviniAdapter($this), $configuration);
             }
@@ -199,10 +198,9 @@ class Advini
      * @param mixed $configuration
      * @param boolean $finalize
      *
-     * @throws Exception
      * @return void
      */
-    public function processConfiguration(mixed &$configuration, bool $finalize = false): void
+    public function processConfiguration(&$configuration, bool $finalize = false): void
     {
         if (true === is_array($configuration)) {
             $this->throughConfiguration($configuration, $finalize);
@@ -215,7 +213,6 @@ class Advini
      * @param array $configuration
      * @param boolean $finalize
      *
-     * @throws Exception
      * @return void
      */
     protected function throughConfiguration(array &$configuration, bool $finalize = false)
@@ -251,13 +248,13 @@ class Advini
     /**
      * @param string $methodName
      * @param string $key
-     * @param array $value
+     * @param callable|string $value
      * @param boolean $finalize
      *
      * @return mixed
      * @throws MissingReference|InvalidValue
      */
-    protected function processMethod(string $methodName, string $key, array $value, bool $finalize = false): mixed
+    protected function processMethod(string $methodName, string $key, $value, bool $finalize = false)
     {
         $result = null;
 
@@ -272,7 +269,7 @@ class Advini
         } elseif (true === function_exists($methodName)) {
             $result = $methodName($value);
         } else {
-            throw new MissingReference('Cannot found method <%s> for <%s>!', $methodName, $key);
+            throw new MissingReference('Cannot find method <%s> for <%s>!', $methodName, $key);
         }
 
         return $result;
@@ -285,7 +282,7 @@ class Advini
      */
     protected function processValueStatements(string &$value): void
     {
-        foreach ($this->instructions as $instructor/** @var Instructor $instructor */) {
+        foreach ($this->instructions as $instructor) {
             if (true === $instructor->canProcessValue($value)) {
                 $instructor->processValue(new AdviniAdapter($this), $value);
             }

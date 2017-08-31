@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php declare(strict_types=1); namespace JBR\Advini\Interfaces;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -44,7 +44,7 @@ interface Instructor
      *
      * @return bool
      */
-    public function canProcessKey(mixed $key): bool;
+    public function canProcessKey($key): bool;
 
     /**
      * @param AdviniAdapter $adapter
@@ -55,11 +55,11 @@ interface Instructor
     public function processKey(AdviniAdapter $adapter, array &$configuration): void;
 
     /**
-     * @param string $value
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessValue(string $value): bool;
+    public function canProcessValue($value): bool;
 
     /**
      * @param AdviniAdapter $adapter
@@ -70,12 +70,12 @@ interface Instructor
     public function processValue(AdviniAdapter $adapter, string &$value): void;
 
     /**
-     * @param string $key
-     * @param string $value
+     * @param int|string|array|float $key
+     * @param int|string|array|float $value
      *
      * @return bool
      */
-    public function canProcessKeyValue(string $key, string $value): bool;
+    public function canProcessKeyValue($key, $value): bool;
 
     /**
      * @param string $key

@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Setter;
+<?php declare(strict_types=1); namespace JBR\Advini\Setter;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -36,12 +36,12 @@ abstract class Conversion implements Setter
 {
     /**
      * @param string $methodName
-     * @param mixed $value
+     * @param callable|string $value
      *
      * @return mixed
      * @throws MissingReference
      */
-    final public function execute(string $methodName, mixed $value): mixed
+    final public function execute(string $methodName, $value)
     {
         $result = null;
         $classMethod = sprintf('%sCommand', $methodName);
