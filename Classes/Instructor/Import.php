@@ -42,7 +42,7 @@ class Import implements Instructor
      *
      * @return bool
      */
-    public function canProcessKey($key)
+    public function canProcessKey(mixed $key): bool
     {
         return (true === is_array($key));
     }
@@ -52,7 +52,7 @@ class Import implements Instructor
      *
      * @return bool
      */
-    public function canProcessValue($value)
+    public function canProcessValue(string $value): bool
     {
         return (
             (true === is_string($value))
@@ -66,7 +66,7 @@ class Import implements Instructor
      *
      * @return void
      */
-    public function processValue(AdviniAdapter $adapter, &$value)
+    public function processValue(AdviniAdapter $adapter, string &$value): void
     {
         $matches = $adapter->matchValue($value, self::PROCESS_TOKEN, '\\[( *[^\\[\\]]+ *)\\]');
         $value = $this->importFromFile($adapter, trim($matches[1]));
@@ -89,23 +89,21 @@ class Import implements Instructor
      * @param AdviniAdapter $adapter
      * @param array $configuration
      *
-     * @return string
+     * @return void
      */
-    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    public function processKey(AdviniAdapter $adapter, array &$configuration): void
     {
         if (true === isset($configuration[self::PROCESS_TOKEN])) {
             $basedOnConfiguration = $this->importFromFile($adapter, $configuration[self::PROCESS_TOKEN]);
             unset($configuration[self::PROCESS_TOKEN]);
             $configuration = array_merge($basedOnConfiguration, $configuration);
         }
-
-        return null;
     }
 
     /**
      * @return string
      */
-    public function getProcessToken()
+    public function getProcessToken(): string
     {
         return self::PROCESS_TOKEN;
     }
@@ -116,7 +114,7 @@ class Import implements Instructor
      *
      * @return bool
      */
-    public function canProcessKeyValue($key, $value)
+    public function canProcessKeyValue(string $key, string $value): bool
     {
         return false;
     }
@@ -127,7 +125,7 @@ class Import implements Instructor
      *
      * @return void
      */
-    public function processKeyValue($key, $value)
+    public function processKeyValue(string $key, string $value): void
     {
 
     }

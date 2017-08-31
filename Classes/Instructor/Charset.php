@@ -50,11 +50,11 @@ class Charset implements Instructor, Converter
     protected $toEncoding = null;
 
     /**
-     * @param string $key
+     * @param mixed $key
      *
      * @return bool
      */
-    public function canProcessKey(string $key): bool
+    public function canProcessKey(mixed $key): bool
     {
         return (true === is_array($key));
     }

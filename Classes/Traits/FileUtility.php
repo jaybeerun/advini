@@ -23,7 +23,6 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  **********************************************************************/
 
-use Exception;
 use JBR\Advini\Exceptions\InvalidValue;
 use JBR\Advini\Exceptions\MissingReference;
 
