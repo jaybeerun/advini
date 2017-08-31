@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Wrapper;
+<?php namespace JBR\Advini\Setter;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,21 +26,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
+use JBR\Advini\Exceptions\InvalidValue;
+use JBR\Advini\Exceptions\MissingReference;
 
 /**
  *
  */
-class Base extends AbstractWrapper
+class DefaultCommands extends Conversion
 {
     /**
      * @param mixed $value
      *
      * @return string
      */
-    public function stringCommand($value)
+    public function stringCommand(mixed $value): string
     {
-        return (string)$value;
+        return (string) $value;
     }
 
     /**
@@ -48,9 +49,9 @@ class Base extends AbstractWrapper
      *
      * @return string
      */
-    public function linesSeparatedCommand(array $value)
+    public function linesSeparatedCommand(array $value): string
     {
-        return implode("\n",$value);
+        return implode("\n", $value);
     }
 
     /**
@@ -58,18 +59,17 @@ class Base extends AbstractWrapper
      *
      * @return string
      */
-    public function commaSeparatedCommand(array $value)
+    public function commaSeparatedCommand(array $value): string
     {
-        return implode(',',$value);
+        return implode(',', $value);
     }
 
     /**
      * @param mixed $value
      *
      * @return string
-     * @throws Exception
      */
-    public function octdecCommand($value)
+    public function octdecCommand(mixed $value): string
     {
         return octdec($value);
     }
@@ -78,24 +78,24 @@ class Base extends AbstractWrapper
      * @param mixed $value
      *
      * @return string
-     * @throws Exception
+     * @throws InvalidValue
      */
-    public function jsonCommand($value)
+    public function jsonCommand(mixed $value): string
     {
         $json = json_decode($value);
 
-        if (NULL === $json) {
-            throw new Exception('Cannot decode json content!');
+        if (null === $json) {
+            throw new InvalidValue('Cannot decode json content!');
         }
 
         return json_encode($json);
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @return array
      */
-    public function arrayCommand($value)
+    public function arrayCommand(mixed $value): array
     {
         if ((false === is_array($value)) && (true === empty($value))) {
             $value = [];
@@ -118,14 +118,14 @@ class Base extends AbstractWrapper
      * @param mixed $value
      *
      * @return string
-     * @throws Exception
+     * @throws InvalidValue
      */
-    public function serializeCommand($value)
+    public function serializeCommand(mixed $value): string
     {
         $result = serialize($value);
 
         if (false === $result) {
-            throw new Exception('Cannot serialize value!');
+            throw new InvalidValue('Cannot serialize value!');
         }
 
         return $result;
@@ -136,7 +136,7 @@ class Base extends AbstractWrapper
      *
      * @return string
      */
-    public function isIntegerCommand($value)
+    public function isIntegerCommand(mixed $value): string
     {
         return floatval($value);
     }
@@ -144,11 +144,11 @@ class Base extends AbstractWrapper
     /**
      * Checks a given mail address of availability.
      *
-     * @param string $mail
+     * @param mixed $mail
      *
      * @return string
      */
-    public function checkMailCommand($mail)
+    public function checkMailCommand(mixed $mail): string
     {
         return $mail;
     }
@@ -159,9 +159,8 @@ class Base extends AbstractWrapper
      * @param string $url
      *
      * @return string
-     * @throws Exception
      */
-    public function checkUrlCommand($url)
+    public function checkUrlCommand(string $url): string
     {
         return $url;
     }
@@ -169,15 +168,15 @@ class Base extends AbstractWrapper
     /**
      * Checks a given path of availability.
      *
-     * @param string $path
+     * @param mixed $path
      *
      * @return string
-     * @throws Exception
+     * @throws MissingReference
      */
-    public function checkDirCommand($path)
+    public function checkDirCommand(mixed $path): string
     {
         if (false === is_dir($path)) {
-            throw new Exception(sprintf('Path <%s> not found!', $path));
+            throw new MissingReference('Path <%s> not found!', $path);
         }
 
         return $path;
@@ -186,15 +185,15 @@ class Base extends AbstractWrapper
     /**
      * Checks a given file of availability.
      *
-     * @param string $fileName
+     * @param mixed $fileName
      *
      * @return string
-     * @throws Exception
+     * @throws MissingReference
      */
-    public function checkFileCommand($fileName)
+    public function checkFileCommand(mixed $fileName): string
     {
         if (false === is_file($fileName)) {
-            throw new Exception(sprintf('Cannot find file <%s>!', $fileName));
+            throw new MissingReference('Cannot find file <%s>!', $fileName);
         }
 
         return $fileName;
@@ -203,15 +202,15 @@ class Base extends AbstractWrapper
     /**
      * Checks a given string of emptiness.
      *
-     * @param string $value
+     * @param mixed $value
      *
      * @return string
-     * @throws Exception
+     * @throws InvalidValue
      */
-    public function notEmptyCommand($value)
+    public function notEmptyCommand(mixed $value): string
     {
         if (true === empty($value)) {
-            throw new Exception('The value cannot be empty!');
+            throw new InvalidValue('The value cannot be empty!');
         }
 
         return $value;
@@ -221,15 +220,15 @@ class Base extends AbstractWrapper
     /**
      * Checks a class name of availability.
      *
-     * @param string $className
+     * @param mixed $className
      *
      * @return string
-     * @throws Exception
+     * @throws MissingReference
      */
-    public function checkClassCommand($className)
+    public function checkClassCommand(mixed $className): string
     {
         if (false === class_exists($className)) {
-            throw new Exception(sprintf('Cannot found class <%s>!', $className));
+            throw new MissingReference('Cannot found class <%s>!', $className);
         }
 
         return $className;

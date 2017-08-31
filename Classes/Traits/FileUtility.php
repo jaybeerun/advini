@@ -24,6 +24,8 @@
  **********************************************************************/
 
 use Exception;
+use JBR\Advini\Exceptions\InvalidValue;
+use JBR\Advini\Exceptions\MissingReference;
 
 /**
  *
@@ -40,17 +42,17 @@ trait FileUtility
     /**
      * @return string
      */
-    public function getCwd()
+    public function getCwd(): string
     {
         return $this->cwd;
     }
 
     /**
-     * @param $path
+     * @param string $path
      *
      * @return void
      */
-    public function setCwd($path)
+    public function setCwd(string $path): void
     {
         $this->assertPath($path);
         $this->cwd = $path;
@@ -59,26 +61,26 @@ trait FileUtility
     /**
      * @param string $pathName
      *
-     * @throws Exception
+     * @throws MissingReference
      * @return void
      */
-    protected function assertPath($pathName)
+    protected function assertPath(string $pathName): void
     {
         if (false === is_dir($pathName)) {
-            throw new Exception(sprintf('Cannot find path <%s>.', $pathName));
+            throw new MissingReference('Cannot find path <%s>.', $pathName);
         }
     }
 
     /**
      * @param string $fileName
      *
-     * @throws Exception
+     * @throws MissingReference
      * @return void
      */
-    protected function assertFile($fileName)
+    protected function assertFile(string $fileName): void
     {
         if (false === is_file($fileName)) {
-            throw new Exception(sprintf('Cannot find file <%s>.', $fileName));
+            throw new MissingReference('Cannot find file <%s>.', $fileName);
         }
     }
 
@@ -86,14 +88,14 @@ trait FileUtility
      * @param string $file
      *
      * @return array
-     * @throws Exception
+     * @throws InvalidValue
      */
-    protected function getArrayFromIniFile($file)
+    protected function getArrayFromIniFile(string $file): array
     {
         $configuration = parse_ini_file($file, true);
 
         if (false === $configuration) {
-            throw new Exception(sprintf('Cannot read ini file <%s>!', $file));
+            throw new InvalidValue('Cannot read ini file <%s>!', $file);
         }
 
         return $configuration;

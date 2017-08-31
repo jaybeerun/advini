@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Wrapper;
+<?php namespace JBR\Advini\Interfaces;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,34 +26,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use Exception;
-use JBR\Advini\Interfaces\WrapperInterface;
-
 /**
  *
+ *
  */
-abstract class AbstractWrapper implements WrapperInterface
+interface Setter
 {
     /**
      * @param string $methodName
      * @param mixed $value
      *
      * @return mixed
-     * @throws Exception
      */
-    final public function execute($methodName, $value)
-    {
-        $result = null;
-        $classMethod = sprintf('%sCommand', $methodName);
-
-        if (true === is_callable([$this, $classMethod])) {
-            $result = $this->{$classMethod}($value);
-        } elseif (true === is_callable($methodName)) {
-            $result = $methodName($value);
-        } else {
-            throw new Exception(sprintf('Cannot find method <%s>!', $methodName));
-        }
-
-        return $result;
-    }
+    public function execute(string $methodName, mixed $value):mixed;
 }

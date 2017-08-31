@@ -28,14 +28,14 @@
 
 use Exception;
 use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Interfaces\ConvertInterface;
-use JBR\Advini\Interfaces\InstructorInterface;
+use JBR\Advini\Interfaces\Converter;
+use JBR\Advini\Interfaces\Instructor;
 
 /**
  *
  *
  */
-class CharsetInstructor implements InstructorInterface, ConvertInterface
+class Charset implements Instructor, Converter
 {
     const PROCESS_TOKEN = '@charset';
 
@@ -50,21 +50,21 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
     protected $toEncoding = null;
 
     /**
-     * @param mixed $key
+     * @param string $key
      *
      * @return bool
      */
-    public function canProcessKey($key)
+    public function canProcessKey(string $key): bool
     {
         return (true === is_array($key));
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      *
      * @return bool
      */
-    public function canProcessValue($value)
+    public function canProcessValue(string $value): bool
     {
         return false;
     }
@@ -76,7 +76,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      * @return void
      * @throws Exception
      */
-    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    public function processKey(AdviniAdapter $adapter, array &$configuration): void
     {
         if (true === isset($configuration[self::PROCESS_TOKEN])) {
             $this->fromEncoding = $this->setEncoding($configuration[self::PROCESS_TOKEN]);
@@ -99,7 +99,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      * @return string
      * @throws Exception
      */
-    protected function setEncoding($charset)
+    protected function setEncoding(string $charset): string
     {
         $charsets = array_flip(mb_list_encodings());
 
@@ -113,7 +113,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
     /**
      * @return string
      */
-    public function getEncoding()
+    public function getEncoding(): string
     {
         return $this->toEncoding;
     }
@@ -124,7 +124,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      *
      * @return void
      */
-    public function processValue(AdviniAdapter $adapter, &$value)
+    public function processValue(AdviniAdapter $adapter, string &$value): void
     {
 
     }
@@ -135,7 +135,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      *
      * @return string
      */
-    public function convert(AdviniAdapter $adapter, $value)
+    public function convert(AdviniAdapter $adapter, string $value): string
     {
         if (null !== $this->fromEncoding) {
             $value = mb_convert_encoding($value, $this->getEncoding(), $this->fromEncoding);
@@ -147,7 +147,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
     /**
      * @return string
      */
-    public function getProcessToken()
+    public function getProcessToken(): string
     {
         return self::PROCESS_TOKEN;
     }
@@ -158,7 +158,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      *
      * @return bool
      */
-    public function canProcessKeyValue($key, $value)
+    public function canProcessKeyValue(string $key, string $value): bool
     {
         return false;
     }
@@ -169,7 +169,7 @@ class CharsetInstructor implements InstructorInterface, ConvertInterface
      *
      * @return void
      */
-    public function processKeyValue($key, $value)
+    public function processKeyValue(string $key, string $value): void
     {
 
     }

@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini\Setter;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -26,19 +26,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Exceptions\MissingReference;
+use JBR\Advini\Interfaces\Setter;
 
 /**
  *
- *
  */
-interface ConvertInterface
+abstract class Conversion implements Setter
 {
     /**
-     * @param AdviniAdapter $adapter
-     * @param string $value
+     * @param string $methodName
+     * @param mixed $value
      *
-     * @return string
+     * @return mixed
+     * @throws MissingReference
      */
-    public function convert(AdviniAdapter $adapter, $value);
+    final public function execute(string $methodName, mixed $value): mixed
+    {
+        $result = null;
+        $classMethod = sprintf('%sCommand', $methodName);
+
+        if (true === is_callable([$this, $classMethod])) {
+            $result = $this->{$classMethod}($value);
+        } elseif (true === is_callable($methodName)) {
+            $result = $methodName($value);
+        } else {
+            throw new MissingReference('Cannot find method <%s>!', $methodName);
+        }
+
+        return $result;
+    }
 }

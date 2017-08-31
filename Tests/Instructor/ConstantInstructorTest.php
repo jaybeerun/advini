@@ -28,7 +28,7 @@
 
 use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Instructor\ConstantInstructor;
+use JBR\Advini\Instructor\Constant;
 
 /**
  *
@@ -43,7 +43,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
      */
     public function testProcessValues()
     {
-        $const = new ConstantInstructor();
+        $const = new Constant();
         $const->setConstants([
             'this' => 'all',
             'ugly' => 'awesome'
@@ -67,7 +67,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
      */
     public function testProcessKey()
     {
-        $const = new ConstantInstructor();
+        $const = new Constant();
         $const->setConstants([
             'this' => 'all',
             'ugly' => 'awesome'
@@ -103,7 +103,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
         $advini = new Advini();
         $adapter = new AdviniAdapter($advini);
 
-        $const = new ConstantInstructor();
+        $const = new Constant();
         $const->setConstants([
             'this' => 'all',
             'ugly' => 'awesome'
@@ -122,7 +122,7 @@ class ConstantInstructorTest extends PHPUnit_Framework_TestCase
         $advini = new Advini();
         $adapter = new AdviniAdapter($advini);
 
-        $const = new ConstantInstructor();
+        $const = new Constant();
         $const->setConstants([
             'this' => 'all',
             'ugly' => 'awesome'

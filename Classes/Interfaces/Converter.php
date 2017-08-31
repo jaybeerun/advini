@@ -26,17 +26,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
+use JBR\Advini\AdviniAdapter;
+
 /**
  *
  *
  */
-interface WrapperInterface
+interface Converter
 {
     /**
-     * @param string $methodName
-     * @param mixed $value
+     * @param AdviniAdapter $adapter
+     * @param string $value
      *
-     * @return mixed
+     * @return string
      */
-    public function execute($methodName, $value);
+    public function convert(AdviniAdapter $adapter, string $value): string;
 }

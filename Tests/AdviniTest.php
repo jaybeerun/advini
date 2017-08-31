@@ -27,9 +27,9 @@
  ************************************************************************************/
 
 use JBR\Advini\Advini;
-use JBR\Advini\Instructor\ConstantInstructor;
-use JBR\Advini\Instructor\ImportInstructor;
-use JBR\Advini\Wrapper\Base;
+use JBR\Advini\Instructor\Constant;
+use JBR\Advini\Instructor\Import;
+use JBR\Advini\Setter\DefaultCommands;
 
 /**
  * Class AdviniTest
@@ -68,7 +68,7 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testSimpleFileWithImport()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile->addInstructor(new Import());
 
         $configuration = $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/simpleImport.ini');
         $this->assertEquals($this->result, serialize($configuration));
@@ -80,7 +80,7 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testSimpleFileWithBasedOnImport()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile->addInstructor(new Import());
 
         $configuration = $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/simpleBasedOnImport.ini');
         $this->assertEquals($this->result, serialize($configuration));
@@ -92,10 +92,10 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testSimpleImportFileWithConstants()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile->addInstructor(new Import());
 
-        /** @var ConstantInstructor $const */
-        $const = new ConstantInstructor();
+        /** @var Constant $const */
+        $const = new Constant();
         $const->setConstantsFromFile(__DIR__ . '/../Resources/Tests/constants.ini');
         $iniFile->addInstructor($const);
 
@@ -110,8 +110,8 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     {
         $iniFile = new Advini();
 
-        /** @var ConstantInstructor $const */
-        $const = new ConstantInstructor();
+        /** @var Constant $const */
+        $const = new Constant();
         $const->setConstantsFromFile(__DIR__ . '/../Resources/Tests/constants.ini');
         $iniFile->addInstructor($const);
 
@@ -124,10 +124,10 @@ class AdviniTest extends PHPUnit_Framework_TestCase
      */
     public function testSimpleFileWithConstantsAndMethods()
     {
-        $iniFile = new Advini(new Base());
+        $iniFile = new Advini(new DefaultCommands());
 
-        /** @var ConstantInstructor $const */
-        $const = new ConstantInstructor();
+        /** @var Constant $const */
+        $const = new Constant();
         $const->setConstantsFromFile(__DIR__ . '/../Resources/Tests/constants.ini');
         $iniFile->addInstructor($const);
 
@@ -140,11 +140,11 @@ class AdviniTest extends PHPUnit_Framework_TestCase
      */
     public function testSimpleImportFileWithConstantsAndMethods()
     {
-        $iniFile = new Advini(new Base());
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile = new Advini(new DefaultCommands());
+        $iniFile->addInstructor(new Import());
 
-        /** @var ConstantInstructor $const */
-        $const = new ConstantInstructor();
+        /** @var Constant $const */
+        $const = new Constant();
         $const->setConstantsFromFile(__DIR__ . '/../Resources/Tests/constants.ini');
         $iniFile->addInstructor($const);
 
@@ -158,7 +158,7 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testSimpleImportAsKeyFileWithConstantsAndMethods()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile->addInstructor(new Import());
 
         $configuration = $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/simpleImportAsKey.ini');
         $this->assertEquals($this->result, serialize($configuration));
@@ -170,10 +170,10 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testSimpleImportAsKeyFileWithConstantsAndMethodsAndDynamicKey()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
+        $iniFile->addInstructor(new Import());
 
-        /** @var ConstantInstructor $const */
-        $const = new ConstantInstructor();
+        /** @var Constant $const */
+        $const = new Constant();
         $const->setConstantsFromFile(__DIR__ . '/../Resources/Tests/constants.ini');
         $iniFile->addInstructor($const);
 
@@ -188,7 +188,7 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testInvalidInstructorException()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor(), 'NotValid');
+        $iniFile->addInstructor(new Import(), 'NotValid');
     }
 
     /**
@@ -198,8 +198,8 @@ class AdviniTest extends PHPUnit_Framework_TestCase
     public function testCollisionInstructorException()
     {
         $iniFile = new Advini();
-        $iniFile->addInstructor(new ImportInstructor());
-        $iniFile->addInstructor(new ImportInstructor(), ConstantInstructor::class);
+        $iniFile->addInstructor(new Import());
+        $iniFile->addInstructor(new Import(), Constant::class);
     }
 
     /**
@@ -218,7 +218,7 @@ class AdviniTest extends PHPUnit_Framework_TestCase
      */
     public function testNotFoundMethodsForWrapperException()
     {
-        $iniFile = new Advini(new Base());
+        $iniFile = new Advini(new DefaultCommands());
         $iniFile->getFromFile(__DIR__ . '/../Resources/Tests/failedSimple.ini');
     }
 }

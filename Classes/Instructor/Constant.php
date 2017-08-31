@@ -29,15 +29,15 @@
 use Exception;
 use JBR\Advini\Advini;
 use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Interfaces\ConvertInterface;
-use JBR\Advini\Interfaces\InstructorInterface;
+use JBR\Advini\Interfaces\Converter;
+use JBR\Advini\Interfaces\Instructor;
 use JBR\Advini\Traits\ArrayUtility;
 
 /**
  *
  *
  */
-class ConstantInstructor implements InstructorInterface
+class Constant implements Instructor
 {
     use ArrayUtility;
 
@@ -58,7 +58,7 @@ class ConstantInstructor implements InstructorInterface
     /**
      * @param bool $automaticallyAddConstants
      */
-    public function __construct($automaticallyAddConstants = false)
+    public function __construct(bool $automaticallyAddConstants = false)
     {
         $this->automaticallyAddConstants = $automaticallyAddConstants;
     }
@@ -68,17 +68,17 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return bool
      */
-    public function canProcessKey($key)
+    public function canProcessKey(mixed $key): bool
     {
         return (true === is_array($key));
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      *
      * @return bool
      */
-    public function canProcessValue($value)
+    public function canProcessValue(string $value): bool
     {
         return ((true === is_string($value)) && (false !== strpos($value, self::PROCESS_TOKEN)));
     }
@@ -89,7 +89,7 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return bool
      */
-    public function canProcessKeyValue($key, $value)
+    public function canProcessKeyValue(string $key, string $value): bool
     {
         return ((true === $this->automaticallyAddConstants) && (true === is_string($value)));
     }
@@ -100,9 +100,20 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return void
      */
-    public function processKeyValue($key, $value)
+    public function processKeyValue(string $key, string $value): void
     {
         $this->setConstant($key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return void
+     */
+    public function setConstant(string $key, mixed $value): void
+    {
+        $this->constants[$key] = $value;
     }
 
     /**
@@ -111,7 +122,7 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return void
      */
-    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    public function processKey(AdviniAdapter $adapter, array &$configuration): void
     {
         $newConfiguration = [];
 
@@ -143,10 +154,10 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return string
      */
-    protected function convert(AdviniAdapter $adapter, $value)
+    protected function convert(AdviniAdapter $adapter, string $value): string
     {
-        if (null !== ($statement = $adapter->getInstructor(CharsetInstructor::class))) {
-            /** @var ConvertInterface $statement */
+        if (null !== ($statement = $adapter->getInstructor(Charset::class))) {
+            /** @var Converter $statement */
             $value = $statement->convert($adapter, $value);
         }
 
@@ -160,7 +171,7 @@ class ConstantInstructor implements InstructorInterface
      * @throws Exception
      * @return void
      */
-    public function processValue(AdviniAdapter $adapter, &$value)
+    public function processValue(AdviniAdapter $adapter, string &$value): void
     {
         while (false !== strpos($value, self::PROCESS_TOKEN)) {
             // You cannot define these chars: $ { } ( )
@@ -187,7 +198,7 @@ class ConstantInstructor implements InstructorInterface
      *
      * @return void
      */
-    public function setConstantsFromFile($file)
+    public function setConstantsFromFile(string $file): void
     {
         $constants = parse_ini_file($file, true);
         $this->extractKeys($constants, Advini::TOKEN_MULTI_KEY_SEPARATOR);
@@ -195,22 +206,11 @@ class ConstantInstructor implements InstructorInterface
     }
 
     /**
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return void
-     */
-    public function setConstant($key, $value)
-    {
-        $this->constants[$key] = $value;
-    }
-
-    /**
      * @param array $constants
      *
      * @return void
      */
-    public function setConstants(array $constants)
+    public function setConstants(array $constants): void
     {
         $this->constants = array_merge($this->constants, $constants);
     }
@@ -218,7 +218,7 @@ class ConstantInstructor implements InstructorInterface
     /**
      * @return string
      */
-    public function getProcessToken()
+    public function getProcessToken(): string
     {
         return self::PROCESS_TOKEN;
     }

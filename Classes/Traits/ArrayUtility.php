@@ -39,7 +39,7 @@ trait ArrayUtility
      *
      * @return void
      */
-    protected function extractKeys(array &$source, $separator)
+    protected function extractKeys(array &$source, string $separator): void
     {
         foreach ($source as $key => &$value) {
             if (true === is_array($value)) {

@@ -27,10 +27,12 @@
  ************************************************************************************/
 
 use Exception;
-use JBR\Advini\Interfaces\InstructorInterface;
+use JBR\Advini\Exceptions\InvalidValue;
+use JBR\Advini\Exceptions\MissingReference;
+use JBR\Advini\Interfaces\Instructor;
 use JBR\Advini\Traits\ArrayUtility;
 use JBR\Advini\Traits\FileUtility;
-use JBR\Advini\Wrapper\AbstractWrapper;
+use JBR\Advini\Setter\Conversion;
 
 /**
  *
@@ -44,12 +46,12 @@ class Advini
     const TOKEN_MULTI_KEY_SEPARATOR = '/';
 
     /**
-     * @var AbstractWrapper
+     * @var Conversion
      */
-    protected $wrapper;
+    protected $conversionSetter;
 
     /**
-     * @var InstructorInterface[]
+     * @var Instructor[]
      */
     protected $instructions = [];
 
@@ -66,17 +68,17 @@ class Advini
     /**
      * Advini constructor.
      *
-     * @param AbstractWrapper $methodsObject
+     * @param Conversion $methodsObject
      */
-    public function __construct(AbstractWrapper $methodsObject = null)
+    public function __construct(Conversion $methodsObject = null)
     {
-        $this->wrapper = $methodsObject;
+        $this->conversionSetter = $methodsObject;
     }
 
     /**
      * @return void
      */
-    public function disableExtractKeys()
+    public function disableExtractKeys(): void
     {
         $this->disableExtractKeys = true;
     }
@@ -84,40 +86,37 @@ class Advini
     /**
      * @return void
      */
-    public function enableExtractKeys()
+    public function enableExtractKeys(): void
     {
         $this->disableExtractKeys = false;
     }
 
     /**
-     * @param InstructorInterface $instructor
+     * @param Instructor $instructor
      * @param string $namespace
      *
-     * @throws Exception
+     * @throws InvalidValue|MissingReference
      * @return void
      */
-    public function addInstructor(InstructorInterface $instructor, $namespace = null)
+    public function addInstructor(Instructor $instructor, $namespace = null): void
     {
         if (null === $namespace) {
             $namespace = get_class($instructor);
         }
 
         if (false === class_exists($namespace)) {
-            throw new Exception(sprintf('Cannot find class <%s> with dependency injection for instructor!',
-                $namespace));
+            throw new MissingReference('Cannot find class <%s> with dependency injection for instructor!', $namespace);
         }
 
         $tokenValue = $instructor->getProcessToken();
 
-        foreach ($this->instructions as $instruction/** @var InstructorInterface $instruction */) {
+        foreach ($this->instructions as $instruction/** @var Instructor $instruction */) {
             if ($instruction->canProcessValue($tokenValue)) {
-                throw new Exception(
-                    sprintf(
-                        'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
-                        get_class($instructor),
-                        get_class($instruction),
-                        $tokenValue
-                    )
+                throw new InvalidValue(
+                    'Cannot add instructor <%s> because the instructor <%s> can process the token value <%s>',
+                    get_class($instructor),
+                    get_class($instruction),
+                    $tokenValue
                 );
             }
         }
@@ -135,7 +134,7 @@ class Advini
      *
      * @return boolean
      */
-    public function hasInstructor($key)
+    public function hasInstructor(string $key): bool
     {
         return (true === isset($this->instructions[$key]));
     }
@@ -143,10 +142,10 @@ class Advini
     /**
      * @param string $key
      *
-     * @return InstructorInterface
+     * @return Instructor
      * @throws Exception
      */
-    public function getInstructor($key)
+    public function getInstructor(string $key): Instructor
     {
         $instructor = null;
 
@@ -163,7 +162,7 @@ class Advini
      *
      * @return array
      */
-    public function getFromFile($file, $finalize = false)
+    public function getFromFile(string $file, bool $finalize = false): array
     {
         $this->assertFile($file);
         $this->setCwd(dirname($file));
@@ -187,9 +186,9 @@ class Advini
      *
      * @return void
      */
-    protected function processKeyInstructions(array &$configuration)
+    protected function processKeyInstructions(array &$configuration): void
     {
-        foreach ($this->instructions as $instructor/** @var InstructorInterface $instructor */) {
+        foreach ($this->instructions as $instructor/** @var Instructor $instructor */) {
             if (true === $instructor->canProcessKey($configuration)) {
                 $instructor->processKey(new AdviniAdapter($this), $configuration);
             }
@@ -203,7 +202,7 @@ class Advini
      * @throws Exception
      * @return void
      */
-    public function processConfiguration(&$configuration, $finalize = false)
+    public function processConfiguration(mixed &$configuration, bool $finalize = false): void
     {
         if (true === is_array($configuration)) {
             $this->throughConfiguration($configuration, $finalize);
@@ -219,7 +218,7 @@ class Advini
      * @throws Exception
      * @return void
      */
-    protected function throughConfiguration(array &$configuration, $finalize = false)
+    protected function throughConfiguration(array &$configuration, bool $finalize = false)
     {
         $this->processKeyInstructions($configuration);
 
@@ -256,26 +255,24 @@ class Advini
      * @param boolean $finalize
      *
      * @return mixed
-     * @throws Exception
+     * @throws MissingReference|InvalidValue
      */
-    protected function processMethod($methodName, $key, $value, $finalize = false)
+    protected function processMethod(string $methodName, string $key, array $value, bool $finalize = false): mixed
     {
         $result = null;
 
         $this->processConfiguration($value, $finalize);
 
-        if (null !== $this->wrapper) {
+        if (null !== $this->conversionSetter) {
             try {
-                $result = $this->wrapper->execute($methodName, $value);
+                $result = $this->conversionSetter->execute($methodName, $value);
             } catch (Exception $e) {
-                throw new Exception(
-                    sprintf('Invalid configuration settings for <%s>! %s', $key, $e->getMessage())
-                );
+                throw new InvalidValue('Invalid configuration settings for <%s>! %s', $key, $e->getMessage());
             }
         } elseif (true === function_exists($methodName)) {
             $result = $methodName($value);
         } else {
-            throw new Exception(sprintf('Cannot found method <%s> for <%s>!', $methodName, $key));
+            throw new MissingReference('Cannot found method <%s> for <%s>!', $methodName, $key);
         }
 
         return $result;
@@ -286,9 +283,9 @@ class Advini
      *
      * @return void
      */
-    protected function processValueStatements(&$value)
+    protected function processValueStatements(string &$value): void
     {
-        foreach ($this->instructions as $instructor/** @var InstructorInterface $instructor */) {
+        foreach ($this->instructions as $instructor/** @var Instructor $instructor */) {
             if (true === $instructor->canProcessValue($value)) {
                 $instructor->processValue(new AdviniAdapter($this), $value);
             }

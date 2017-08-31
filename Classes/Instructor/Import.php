@@ -1,4 +1,4 @@
-<?php namespace JBR\Advini\Interfaces;
+<?php namespace JBR\Advini\Instructor;
 
 /************************************************************************************
  * Copyright (c) 2016, Jan Runte
@@ -27,39 +27,38 @@
  ************************************************************************************/
 
 use JBR\Advini\AdviniAdapter;
+use JBR\Advini\Interfaces\Instructor;
 
 /**
  *
  *
  */
-interface InstructorInterface
+class Import implements Instructor
 {
-    /**
-     * @return string
-     */
-    public function getProcessToken();
+    const PROCESS_TOKEN = '@import';
 
     /**
      * @param mixed $key
      *
      * @return bool
      */
-    public function canProcessKey($key);
-
-    /**
-     * @param AdviniAdapter $adapter
-     * @param array $configuration
-     *
-     * @return void
-     */
-    public function processKey(AdviniAdapter $adapter, array &$configuration);
+    public function canProcessKey($key)
+    {
+        return (true === is_array($key));
+    }
 
     /**
      * @param mixed $value
      *
      * @return bool
      */
-    public function canProcessValue($value);
+    public function canProcessValue($value)
+    {
+        return (
+            (true === is_string($value))
+            && (self::PROCESS_TOKEN === substr($value, 0, strlen(self::PROCESS_TOKEN)))
+        );
+    }
 
     /**
      * @param AdviniAdapter $adapter
@@ -67,7 +66,49 @@ interface InstructorInterface
      *
      * @return void
      */
-    public function processValue(AdviniAdapter $adapter, &$value);
+    public function processValue(AdviniAdapter $adapter, &$value)
+    {
+        $matches = $adapter->matchValue($value, self::PROCESS_TOKEN, '\\[( *[^\\[\\]]+ *)\\]');
+        $value = $this->importFromFile($adapter, trim($matches[1]));
+    }
+
+    /**
+     * @param AdviniAdapter $adapter
+     * @param string $file
+     *
+     * @return array
+     */
+    protected function importFromFile(AdviniAdapter $adapter, $file)
+    {
+        $importFile = sprintf('%s/%s', $adapter->getCwd(), $file);
+
+        return $adapter->getFromFile($importFile);
+    }
+
+    /**
+     * @param AdviniAdapter $adapter
+     * @param array $configuration
+     *
+     * @return string
+     */
+    public function processKey(AdviniAdapter $adapter, array &$configuration)
+    {
+        if (true === isset($configuration[self::PROCESS_TOKEN])) {
+            $basedOnConfiguration = $this->importFromFile($adapter, $configuration[self::PROCESS_TOKEN]);
+            unset($configuration[self::PROCESS_TOKEN]);
+            $configuration = array_merge($basedOnConfiguration, $configuration);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProcessToken()
+    {
+        return self::PROCESS_TOKEN;
+    }
 
     /**
      * @param string $key
@@ -75,7 +116,10 @@ interface InstructorInterface
      *
      * @return bool
      */
-    public function canProcessKeyValue($key, $value);
+    public function canProcessKeyValue($key, $value)
+    {
+        return false;
+    }
 
     /**
      * @param string $key
@@ -83,5 +127,8 @@ interface InstructorInterface
      *
      * @return void
      */
-    public function processKeyValue($key, $value);
+    public function processKeyValue($key, $value)
+    {
+
+    }
 }

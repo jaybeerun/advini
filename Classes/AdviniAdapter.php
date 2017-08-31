@@ -27,7 +27,8 @@
  ************************************************************************************/
 
 use Exception;
-use JBR\Advini\Interfaces\InstructorInterface;
+use JBR\Advini\Exceptions\InvalidValue;
+use JBR\Advini\Interfaces\Instructor;
 
 /**
  *
@@ -49,9 +50,9 @@ class AdviniAdapter
 
     /**
      * @param string $key
-     * @return InstructorInterface
+     * @return Instructor
      */
-    public function getInstructor($key)
+    public function getInstructor(string $key): Instructor
     {
         $instructor = null;
 
@@ -65,7 +66,7 @@ class AdviniAdapter
     /**
      * @return string
      */
-    public function getCwd()
+    public function getCwd(): string
     {
         return $this->object->getCwd();
     }
@@ -75,7 +76,7 @@ class AdviniAdapter
      *
      * @return array
      */
-    public function getFromFile($file)
+    public function getFromFile(string $file): array
     {
         return $this->object->getFromFile($file, true);
     }
@@ -87,7 +88,7 @@ class AdviniAdapter
      *
      * @return array
      */
-    public function matchNextValue($value, $token, $pattern)
+    public function matchNextValue(string $value, string $token, string $pattern): array
     {
         $pattern = sprintf('/%s%s/', $this->escapedTokenPattern($token), $pattern);
 
@@ -98,9 +99,8 @@ class AdviniAdapter
      * @param string $value
      *
      * @return mixed
-     * @throws Exception
      */
-    protected function escapedTokenPattern($value)
+    protected function escapedTokenPattern(string $value): mixed
     {
         return preg_replace(
             '/(\\{|\\(|\\[|\\$|\\+|\\*|\\?|\\.|\\^|\\]|\\)|\\})/',
@@ -116,10 +116,10 @@ class AdviniAdapter
      * @return array
      * @throws Exception
      */
-    protected function match($pattern, $value)
+    protected function match(string $pattern, string $value): array
     {
         if (1 !== preg_match($pattern, $value, $matches)) {
-            throw new Exception(sprintf('Cannot parse instructor for: %s', $value));
+            throw new InvalidValue('Cannot parse instructor for: %s', $value);
         }
 
         return $matches;
@@ -132,7 +132,7 @@ class AdviniAdapter
      *
      * @return array
      */
-    public function matchValue($value, $token, $pattern)
+    public function matchValue(string $value, string $token, string $pattern): array
     {
         $pattern = sprintf('/^%s%s$/', $this->escapedTokenPattern($token), $pattern);
 

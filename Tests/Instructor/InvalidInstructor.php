@@ -27,12 +27,12 @@
  ************************************************************************************/
 
 use JBR\Advini\AdviniAdapter;
-use JBR\Advini\Interfaces\InstructorInterface;
+use JBR\Advini\Interfaces\Instructor;
 
 /**
  * Class InvalidInstructor
  */
-class InvalidInstructor implements InstructorInterface
+class InvalidInstructor implements Instructor
 {
     const PROCESS_TOKEN = null;
 
