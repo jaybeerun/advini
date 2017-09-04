@@ -32,9 +32,9 @@ namespace JBR\Advini {
     use JBR\Advini\Exceptions\InvalidValue;
     use JBR\Advini\Exceptions\MissingReference;
     use JBR\Advini\Interfaces\Instructor;
+    use JBR\Advini\Setter\Conversion;
     use JBR\Advini\Traits\ArrayUtility;
     use JBR\Advini\Traits\FileUtility;
-    use JBR\Advini\Setter\Conversion;
 
     /**
      *
