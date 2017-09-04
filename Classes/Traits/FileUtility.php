@@ -1,102 +1,105 @@
-<?php declare(strict_types=1); namespace JBR\Advini\Traits;
+<?php declare(strict_types=1);
 
-/**********************************************************************
- *  Copyright notice
- *
- *  (c) 2016 Jan Runte (jan.runte@hmmh.de), hmmh AG
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify it under
- *  the terms of the GNU General Public License as published by the
- *  Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- **********************************************************************/
+namespace JBR\Advini\Traits {
 
-use JBR\Advini\Exceptions\InvalidValue;
-use JBR\Advini\Exceptions\MissingReference;
-
-/**
- *
- */
-trait FileUtility
-{
-    /**
-     * Current working directory
+    /**********************************************************************
+     *  Copyright notice
      *
-     * @var string
-     */
-    private $cwd = null;
-
-    /**
-     * @return string
-     */
-    public function getCwd(): string
-    {
-        return $this->cwd;
-    }
-
-    /**
-     * @param string $path
+     *  (c) 2016 Jan Runte (jan.runte@hmmh.de), hmmh AG
+     *  All rights reserved
      *
-     * @return void
-     */
-    public function setCwd(string $path): void
-    {
-        $this->assertPath($path);
-        $this->cwd = $path;
-    }
+     *  This script is part of the TYPO3 project. The TYPO3 project is
+     *  free software; you can redistribute it and/or modify it under
+     *  the terms of the GNU General Public License as published by the
+     *  Free Software Foundation; either version 2 of the License, or
+     *  (at your option) any later version.
+     *
+     *  The GNU General Public License can be found at
+     *  http://www.gnu.org/copyleft/gpl.html.
+     *
+     *  This script is distributed in the hope that it will be useful,
+     *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+     *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     *  GNU General Public License for more details.
+     *
+     *  This copyright notice MUST APPEAR in all copies of the script!
+     **********************************************************************/
+
+    use JBR\Advini\Exceptions\InvalidValue;
+    use JBR\Advini\Exceptions\MissingReference;
 
     /**
-     * @param string $pathName
      *
-     * @throws MissingReference
-     * @return void
      */
-    protected function assertPath(string $pathName): void
+    trait FileUtility
     {
-        if (false === is_dir($pathName)) {
-            throw new MissingReference('Cannot find path <%s>.', $pathName);
-        }
-    }
+        /**
+         * Current working directory
+         *
+         * @var string
+         */
+        private $cwd = null;
 
-    /**
-     * @param string $fileName
-     *
-     * @throws MissingReference
-     * @return void
-     */
-    protected function assertFile(string $fileName): void
-    {
-        if (false === is_file($fileName)) {
-            throw new MissingReference('Cannot find file <%s>.', $fileName);
-        }
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return array
-     * @throws InvalidValue
-     */
-    protected function getArrayFromIniFile(string $file): array
-    {
-        $configuration = parse_ini_file($file, true);
-
-        if (false === $configuration) {
-            throw new InvalidValue('Cannot read ini file <%s>!', $file);
+        /**
+         * @return string
+         */
+        public function getCwd(): string
+        {
+            return $this->cwd;
         }
 
-        return $configuration;
+        /**
+         * @param string $path
+         *
+         * @return void
+         */
+        public function setCwd(string $path): void
+        {
+            $this->assertPath($path);
+            $this->cwd = $path;
+        }
+
+        /**
+         * @param string $pathName
+         *
+         * @throws MissingReference
+         * @return void
+         */
+        protected function assertPath(string $pathName): void
+        {
+            if (false === is_dir($pathName)) {
+                throw new MissingReference('Cannot find path <%s>.', $pathName);
+            }
+        }
+
+        /**
+         * @param string $fileName
+         *
+         * @throws MissingReference
+         * @return void
+         */
+        protected function assertFile(string $fileName): void
+        {
+            if (false === is_file($fileName)) {
+                throw new MissingReference('Cannot find file <%s>.', $fileName);
+            }
+        }
+
+        /**
+         * @param string $file
+         *
+         * @return array
+         * @throws InvalidValue
+         */
+        protected function getArrayFromIniFile(string $file): array
+        {
+            $configuration = parse_ini_file($file, true);
+
+            if (false === $configuration) {
+                throw new InvalidValue('Cannot read ini file <%s>!', $file);
+            }
+
+            return $configuration;
+        }
     }
 }
